@@ -127,7 +127,7 @@ This plan breaks down the development of the Word Learning app into discrete wor
 
 ---
 
-### WI-06: TTS Integration
+### WI-06: TTS Integration ✅
 
 **Description**: Implement Web Speech API wrapper for text-to-speech functionality.
 
@@ -140,13 +140,14 @@ This plan breaks down the development of the Word Learning app into discrete wor
 - Implement `stopSpeaking()` to cancel ongoing speech
 
 **Acceptance Criteria**:
-- [ ] Function speaks provided word clearly
-- [ ] Works in Chrome, Firefox, Safari
-- [ ] Graceful fallback/error message if TTS unavailable
-- [ ] Speech can be stopped mid-word
-- [ ] Rate/pitch are appropriate for kids (not too fast/slow)
+- [x] Function speaks provided word clearly
+- [x] Works in Chrome, Firefox, Safari
+- [x] Graceful fallback/error message if TTS unavailable
+- [x] Speech can be stopped mid-word
+- [x] Rate/pitch are appropriate for kids (not too fast/slow)
 
 **Estimated Effort**: 2-3 hours
+**Status**: ✅ Completed
 
 ---
 
