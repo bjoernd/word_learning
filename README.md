@@ -83,10 +83,10 @@ See `spec/001-plan.md` for the full implementation plan with detailed work items
 ### Current Status
 
 - [x] WI-01: Project Setup
+- [x] WI-02: localStorage Service
 
 ### Upcoming Work Items
 
-- [ ] WI-02: localStorage Service
 - [ ] WI-03: Word Database Model
 - [ ] WI-04: Words Management UI
 - [ ] WI-05: Words List Component
