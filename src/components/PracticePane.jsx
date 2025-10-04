@@ -18,6 +18,10 @@ function PracticePane() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isShowingFeedback, setIsShowingFeedback] = useState(false);
   const [spellCheckResult, setSpellCheckResult] = useState(null);
+  const [volume, setVolume] = useState(() => {
+    const stored = localStorage.getItem('wordLearning_volume');
+    return stored ? parseFloat(stored) : 1.0;
+  });
 
   const inputRef = useRef(null);
 
@@ -29,6 +33,15 @@ function PracticePane() {
       inputRef.current.focus();
     }
   }, [currentWord, isShowingFeedback, isSpeaking]);
+
+  /**
+   * Handle volume change and persist to localStorage
+   */
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    localStorage.setItem('wordLearning_volume', newVolume.toString());
+  };
 
   /**
    * Select and speak the next word for practice
@@ -54,7 +67,7 @@ function PracticePane() {
     if (isTTSSupported() && nextWord) {
       setIsSpeaking(true);
       try {
-        await speakWord(nextWord);
+        await speakWord(nextWord, { volume });
       } catch (error) {
         console.error('TTS error:', error);
         setFeedback('Could not speak the word. Click "Speak Word" to try again.');
@@ -80,7 +93,7 @@ function PracticePane() {
 
     setIsSpeaking(true);
     try {
-      await speakWord(currentWord);
+      await speakWord(currentWord, { volume });
     } catch (error) {
       console.error('TTS error:', error);
       setFeedback('Oops! Could not speak the word. Please try again.');
@@ -214,6 +227,24 @@ function PracticePane() {
         >
           Replay Word
         </button>
+      </div>
+
+      {/* Volume Control */}
+      <div className="volume-control">
+        <label htmlFor="volume-slider" className="volume-label">
+          🔊 Volume: {Math.round(volume * 100)}%
+        </label>
+        <input
+          id="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={volume}
+          onChange={handleVolumeChange}
+          className="volume-slider"
+          aria-label="Adjust volume"
+        />
       </div>
 
       {/* Input Section */}
