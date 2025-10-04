@@ -3,6 +3,7 @@ import { speakWord, isTTSSupported } from '../services/tts';
 import { getScore, saveScore, getWords } from '../services/storage';
 import { getRandomWord } from '../utils/wordModel';
 import { checkSpelling } from '../utils/spellChecker';
+import FeedbackDisplay from './FeedbackDisplay';
 import './PracticePane.css';
 
 /**
@@ -16,8 +17,7 @@ function PracticePane() {
   const [feedback, setFeedback] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isShowingFeedback, setIsShowingFeedback] = useState(false);
-  // Spell check result will be used in WI-11 for detailed feedback display
-  const [_spellCheckResult, setSpellCheckResult] = useState(null);
+  const [spellCheckResult, setSpellCheckResult] = useState(null);
 
   const inputRef = useRef(null);
 
@@ -121,9 +121,6 @@ function PracticePane() {
     // Update score if correct
     if (result.isCorrect) {
       updateScore(score + 1);
-      setFeedback('Great job! You spelled it correctly!');
-    } else {
-      setFeedback('Not quite right. Try again!');
     }
 
     // Set feedback state
@@ -245,18 +242,17 @@ function PracticePane() {
       </form>
 
       {/* Feedback Section */}
-      {feedback && (
+      {isShowingFeedback && spellCheckResult && (
+        <FeedbackDisplay
+          spellCheckResult={spellCheckResult}
+          onNextWord={handleNextWord}
+        />
+      )}
+
+      {/* Simple feedback messages (for non-spell-check feedback) */}
+      {feedback && !isShowingFeedback && (
         <div className="feedback-section" role="alert">
           <p className="feedback-message">{feedback}</p>
-          {isShowingFeedback && (
-            <button
-              onClick={handleNextWord}
-              className="next-word-button"
-              aria-label="Get next word"
-            >
-              Next Word
-            </button>
-          )}
         </div>
       )}
 
