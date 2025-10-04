@@ -17,17 +17,21 @@ function WordsList() {
   }, []);
 
   /**
-   * Load words from localStorage
+   * Load words from localStorage and sort alphabetically
    */
   const loadWords = () => {
     const storedWords = getWords();
-    setWords(storedWords);
+    // Sort words alphabetically (case-insensitive)
+    const sortedWords = [...storedWords].sort((a, b) =>
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    );
+    setWords(sortedWords);
   };
 
   /**
    * Handle word deletion with confirmation
    */
-  const handleDelete = (wordToDelete, index) => {
+  const handleDelete = (wordToDelete) => {
     // Ask for confirmation
     const confirmed = window.confirm(
       `Are you sure you want to delete "${wordToDelete}"?`
@@ -37,15 +41,18 @@ function WordsList() {
       return;
     }
 
-    // Remove word from list
-    const updatedWords = words.filter((_, i) => i !== index);
+    // Remove word from list (filter by word, not index)
+    const updatedWords = words.filter(word => word !== wordToDelete);
 
     // Save to localStorage
     const saved = saveWords(updatedWords);
 
     if (saved) {
-      // Update local state
-      setWords(updatedWords);
+      // Update local state with sorted list
+      const sortedWords = [...updatedWords].sort((a, b) =>
+        a.toLowerCase().localeCompare(b.toLowerCase())
+      );
+      setWords(sortedWords);
     } else {
       // Show error if save failed
       alert('Oops! Could not delete the word. Please try again.');
@@ -73,7 +80,7 @@ function WordsList() {
               <li key={`${word}-${index}`} className="word-item">
                 <span className="word-text">{word}</span>
                 <button
-                  onClick={() => handleDelete(word, index)}
+                  onClick={() => handleDelete(word)}
                   className="delete-button"
                   aria-label={`Delete ${word}`}
                 >
