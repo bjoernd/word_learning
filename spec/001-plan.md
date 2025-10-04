@@ -298,7 +298,7 @@ This plan breaks down the development of the Word Learning app into discrete wor
 
 ---
 
-### WI-13: Navigation Between Panes
+### WI-13: Navigation Between Panes ✅
 
 **Description**: Create tab/pane switching between Practice and Manage Words views.
 
@@ -311,12 +311,13 @@ This plan breaks down the development of the Word Learning app into discrete wor
 - Ensure switching preserves state (score doesn't reset)
 
 **Acceptance Criteria**:
-- [ ] Users can switch between Practice and Manage Words
-- [ ] Active tab is visually indicated
-- [ ] Switching doesn't reset score or word database
-- [ ] Navigation is intuitive for kids
+- [x] Users can switch between Practice and Manage Words
+- [x] Active tab is visually indicated
+- [x] Switching doesn't reset score or word database
+- [x] Navigation is intuitive for kids
 
 **Estimated Effort**: 2 hours
+**Status**: ✅ Completed
 
 ---
 

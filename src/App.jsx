@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import PracticePane from './components/PracticePane';
+import WordsManagement from './components/WordsManagement';
+import './App.css';
 
+/**
+ * Main App Component
+ * Container for the Word Learning app with tab navigation
+ */
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState('practice');
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="app">
+      <header className="app-header">
+        <h1>Word Learning App</h1>
+        <p className="app-subtitle">Practice your spelling!</p>
+      </header>
+
+      <nav className="tab-navigation" role="tablist">
+        <button
+          role="tab"
+          aria-selected={activeTab === 'practice'}
+          aria-controls="practice-panel"
+          className={`tab ${activeTab === 'practice' ? 'active' : ''}`}
+          onClick={() => handleTabChange('practice')}
+        >
+          Practice
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+        <button
+          role="tab"
+          aria-selected={activeTab === 'manage'}
+          aria-controls="manage-panel"
+          className={`tab ${activeTab === 'manage' ? 'active' : ''}`}
+          onClick={() => handleTabChange('manage')}
+        >
+          Manage Words
+        </button>
+      </nav>
+
+      <main className="app-content">
+        <div
+          id="practice-panel"
+          role="tabpanel"
+          aria-labelledby="practice-tab"
+          className={`tab-panel ${activeTab === 'practice' ? 'active' : 'hidden'}`}
+        >
+          {activeTab === 'practice' && <PracticePane />}
+        </div>
+
+        <div
+          id="manage-panel"
+          role="tabpanel"
+          aria-labelledby="manage-tab"
+          className={`tab-panel ${activeTab === 'manage' ? 'active' : 'hidden'}`}
+        >
+          {activeTab === 'manage' && <WordsManagement />}
+        </div>
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
