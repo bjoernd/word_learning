@@ -90,8 +90,12 @@ export function speakWord(word, options = {}) {
     // Stop any ongoing speech first
     stopSpeaking();
 
+    // Add a brief silent prefix to prevent audio clipping at the start
+    // Multiple periods create a longer pause that gives the audio system time to initialize
+    const textToSpeak = '... ' + word.trim();
+
     // Create utterance
-    const utterance = new SpeechSynthesisUtterance(word.trim());
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
     // Set voice
     const voice = selectBestVoice();
