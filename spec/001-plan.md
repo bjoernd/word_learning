@@ -178,7 +178,7 @@ This plan breaks down the development of the Word Learning app into discrete wor
 
 ---
 
-### WI-08: Word Selection Logic
+### WI-08: Word Selection Logic ✅
 
 **Description**: Implement random word picker for practice sessions.
 
@@ -190,12 +190,13 @@ This plan breaks down the development of the Word Learning app into discrete wor
 - Prevent same word appearing twice in a row (if possible)
 
 **Acceptance Criteria**:
-- [ ] Random word selected from database
-- [ ] Word is spoken automatically or via button
-- [ ] Handles empty database gracefully
-- [ ] Word changes when "Next Word" clicked
+- [x] Random word selected from database
+- [x] Word is spoken automatically or via button
+- [x] Handles empty database gracefully
+- [x] Word changes when "Next Word" clicked
 
 **Estimated Effort**: 1-2 hours
+**Status**: ✅ Completed
 
 ---
 

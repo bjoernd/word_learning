@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { speakWord, isTTSSupported } from '../services/tts';
-import { getScore, saveScore } from '../services/storage';
+import { getScore, saveScore, getWords } from '../services/storage';
+import { getRandomWord } from '../utils/wordModel';
 import './PracticePane.css';
 
 /**
@@ -8,11 +9,45 @@ import './PracticePane.css';
  * Main interface for practicing spelling words
  */
 function PracticePane() {
-  const [currentWord] = useState(''); // setCurrentWord will be used in WI-08
+  const [currentWord, setCurrentWord] = useState('');
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(() => getScore());
   const [feedback, setFeedback] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  /**
+   * Select and speak the next word for practice
+   * Handles edge cases: empty database, preventing same word twice
+   */
+  const selectNextWord = async () => {
+    const words = getWords();
+
+    // Handle empty database
+    if (words.length === 0) {
+      setFeedback('No words in the database! Go to "Manage Words" to add some.');
+      setCurrentWord('');
+      return;
+    }
+
+    // Get a random word, avoiding the current word if possible
+    const nextWord = getRandomWord(words, currentWord);
+    setCurrentWord(nextWord);
+    setFeedback('');
+    setUserInput('');
+
+    // Automatically speak the word if TTS is supported
+    if (isTTSSupported() && nextWord) {
+      setIsSpeaking(true);
+      try {
+        await speakWord(nextWord);
+      } catch (error) {
+        console.error('TTS error:', error);
+        setFeedback('Could not speak the word. Click "Speak Word" to try again.');
+      } finally {
+        setIsSpeaking(false);
+      }
+    }
+  };
 
   /**
    * Handle Speak Word button click
@@ -79,12 +114,10 @@ function PracticePane() {
   };
 
   /**
-   * Get a new word (to be implemented in WI-08)
+   * Get a new word
    */
   const handleGetWord = () => {
-    // Word selection logic will be added in WI-08
-    setFeedback('Word selection will be implemented soon!');
-    setUserInput('');
+    selectNextWord();
   };
 
   return (

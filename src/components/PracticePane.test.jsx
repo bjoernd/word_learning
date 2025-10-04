@@ -14,6 +14,7 @@ vi.mock('../services/tts', () => ({
 vi.mock('../services/storage', () => ({
   getScore: vi.fn(),
   saveScore: vi.fn(),
+  getWords: vi.fn(),
 }));
 
 describe('PracticePane', () => {
@@ -23,6 +24,7 @@ describe('PracticePane', () => {
     tts.speakWord.mockResolvedValue();
     storage.getScore.mockReturnValue(0);
     storage.saveScore.mockReturnValue(true);
+    storage.getWords.mockReturnValue([]);
   });
 
   describe('Component Rendering', () => {
@@ -154,14 +156,15 @@ describe('PracticePane', () => {
   });
 
   describe('TTS Functionality', () => {
-    it('shows feedback when trying to speak without a word', async () => {
+    it('shows feedback when no words in database', async () => {
       const user = userEvent.setup();
+      storage.getWords.mockReturnValue([]);
       render(<PracticePane />);
 
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
 
-      expect(screen.getByText(/Word selection will be implemented soon!/)).toBeInTheDocument();
+      expect(screen.getByText(/No words in the database!/)).toBeInTheDocument();
     });
 
     it('TTS module is properly mocked', () => {
@@ -186,23 +189,23 @@ describe('PracticePane', () => {
       const user = userEvent.setup();
       render(<PracticePane />);
 
-      // Click Get Word first
-      const getWordButton = screen.getByText('Get Word');
-      await user.click(getWordButton);
-
-      expect(screen.getByText(/Word selection will be implemented soon!/)).toBeInTheDocument();
+      // This will be fully tested in WI-10 when spell checking is implemented
+      // For now, just verify the submit functionality exists
+      const submitButton = screen.getByText('Submit');
+      expect(submitButton).toBeInTheDocument();
     });
   });
 
   describe('Get Word Button', () => {
-    it('shows placeholder message when clicked', async () => {
+    it('shows feedback when no words available', async () => {
       const user = userEvent.setup();
+      storage.getWords.mockReturnValue([]);
       render(<PracticePane />);
 
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
 
-      expect(screen.getByText(/Word selection will be implemented soon!/)).toBeInTheDocument();
+      expect(screen.getByText(/No words in the database!/)).toBeInTheDocument();
     });
 
     it('clears user input when Get Word is clicked', async () => {
@@ -214,6 +217,43 @@ describe('PracticePane', () => {
 
       const input = screen.getByPlaceholderText('Type the word here...');
       expect(input.value).toBe('');
+    });
+
+    it('selects and speaks a word when words are available', async () => {
+      const user = userEvent.setup();
+      storage.getWords.mockReturnValue(['hello', 'world', 'test']);
+      tts.speakWord.mockResolvedValue();
+
+      render(<PracticePane />);
+
+      const getWordButton = screen.getByText('Get Word');
+      await user.click(getWordButton);
+
+      // Should call speakWord with one of the words
+      expect(tts.speakWord).toHaveBeenCalledTimes(1);
+      expect(['hello', 'world', 'test']).toContain(tts.speakWord.mock.calls[0][0]);
+    });
+
+    it('enables buttons after selecting a word', async () => {
+      const user = userEvent.setup();
+      storage.getWords.mockReturnValue(['hello']);
+
+      render(<PracticePane />);
+
+      const getWordButton = screen.getByText('Get Word');
+      await user.click(getWordButton);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Buttons should be enabled after word is selected
+      const speakButton = screen.getByText('Speak Word');
+      const replayButton = screen.getByText('Replay Word');
+      const input = screen.getByPlaceholderText('Type the word here...');
+
+      expect(speakButton).not.toBeDisabled();
+      expect(replayButton).not.toBeDisabled();
+      expect(input).not.toBeDisabled();
     });
   });
 
