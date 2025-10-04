@@ -275,7 +275,7 @@ This plan breaks down the development of the Word Learning app into discrete wor
 
 ---
 
-### WI-12: Score Tracker
+### WI-12: Score Tracker ✅
 
 **Description**: Implement and display running score.
 
@@ -288,12 +288,13 @@ This plan breaks down the development of the Word Learning app into discrete wor
 - Add "Reset Score" button (optional, for starting fresh)
 
 **Acceptance Criteria**:
-- [ ] Score increments correctly
-- [ ] Score persists across page refreshes
-- [ ] Score displays clearly in UI
-- [ ] Reset functionality works (if implemented)
+- [x] Score increments correctly
+- [x] Score persists across page refreshes
+- [x] Score displays clearly in UI
+- [x] Reset functionality works (if implemented)
 
 **Estimated Effort**: 1-2 hours
+**Status**: ✅ Completed
 
 ---
 

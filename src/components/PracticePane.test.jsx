@@ -95,6 +95,87 @@ describe('PracticePane', () => {
       expect(screen.getByText('0')).toBeInTheDocument();
       expect(screen.getByText('Score reset to 0!')).toBeInTheDocument();
     });
+
+    it('increments score when correct answer is submitted', async () => {
+      const user = userEvent.setup();
+      storage.getScore.mockReturnValue(0);
+      storage.getWords.mockReturnValue(['hello']);
+      storage.saveScore.mockReturnValue(true);
+
+      render(<PracticePane />);
+
+      // Get a word first
+      const getWordButton = screen.getByText('Get Word');
+      await user.click(getWordButton);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Type the correct answer
+      const input = screen.getByPlaceholderText('Type the word here...');
+      await user.type(input, 'hello');
+
+      // Submit the form
+      const submitButton = screen.getByText('Submit');
+      await user.click(submitButton);
+
+      // Verify score was incremented and saved
+      expect(storage.saveScore).toHaveBeenCalledWith(1);
+      expect(screen.getByText('1')).toBeInTheDocument();
+    });
+
+    it('does not increment score when incorrect answer is submitted', async () => {
+      const user = userEvent.setup();
+      storage.getScore.mockReturnValue(5);
+      storage.getWords.mockReturnValue(['hello']);
+
+      render(<PracticePane />);
+
+      // Get a word first
+      const getWordButton = screen.getByText('Get Word');
+      await user.click(getWordButton);
+
+      // Wait for async operations
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Clear any previous saveScore calls
+      storage.saveScore.mockClear();
+
+      // Type an incorrect answer
+      const input = screen.getByPlaceholderText('Type the word here...');
+      await user.type(input, 'helo');
+
+      // Submit the form
+      const submitButton = screen.getByText('Submit');
+      await user.click(submitButton);
+
+      // Verify score was NOT saved (not incremented)
+      expect(storage.saveScore).not.toHaveBeenCalled();
+      expect(screen.getByText('5')).toBeInTheDocument();
+    });
+
+    it('persists score to localStorage on each increment', async () => {
+      const user = userEvent.setup();
+      storage.getScore.mockReturnValue(3);
+      storage.getWords.mockReturnValue(['test']);
+      storage.saveScore.mockReturnValue(true);
+
+      render(<PracticePane />);
+
+      // Get a word
+      const getWordButton = screen.getByText('Get Word');
+      await user.click(getWordButton);
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Submit correct answer
+      const input = screen.getByPlaceholderText('Type the word here...');
+      await user.type(input, 'test');
+      const submitButton = screen.getByText('Submit');
+      await user.click(submitButton);
+
+      // Verify saveScore was called with incremented value
+      expect(storage.saveScore).toHaveBeenCalledWith(4);
+    });
   });
 
   describe('Button States', () => {
