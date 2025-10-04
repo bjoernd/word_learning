@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { speakWord, isTTSSupported } from '../services/tts';
 import { getScore, saveScore, getWords } from '../services/storage';
 import { getRandomWord } from '../utils/wordModel';
+import { checkSpelling } from '../utils/spellChecker';
 import './PracticePane.css';
 
 /**
@@ -15,6 +16,8 @@ function PracticePane() {
   const [feedback, setFeedback] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isShowingFeedback, setIsShowingFeedback] = useState(false);
+  // Spell check result will be used in WI-11 for detailed feedback display
+  const [_spellCheckResult, setSpellCheckResult] = useState(null);
 
   const inputRef = useRef(null);
 
@@ -102,7 +105,7 @@ function PracticePane() {
 
   /**
    * Handle form submission
-   * Spell checking logic will be added in WI-10
+   * Check spelling and update score
    */
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -111,9 +114,20 @@ function PracticePane() {
       return;
     }
 
+    // Check spelling
+    const result = checkSpelling(userInput, currentWord);
+    setSpellCheckResult(result);
+
+    // Update score if correct
+    if (result.isCorrect) {
+      updateScore(score + 1);
+      setFeedback('Great job! You spelled it correctly!');
+    } else {
+      setFeedback('Not quite right. Try again!');
+    }
+
     // Set feedback state
     setIsShowingFeedback(true);
-    setFeedback('Checking your spelling... (Full spell checking will be added in WI-10)');
 
     // Clear input after submission
     setUserInput('');
@@ -148,6 +162,7 @@ function PracticePane() {
   const handleDismissFeedback = () => {
     setIsShowingFeedback(false);
     setFeedback('');
+    setSpellCheckResult(null);
   };
 
   /**
