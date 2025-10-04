@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getWords, saveWords } from '../services/storage';
 import { isValidWord, isDuplicate } from '../utils/wordModel';
+import WordsList from './WordsList';
 import './WordsManagement.css';
 
 /**
@@ -10,6 +11,7 @@ import './WordsManagement.css';
 function WordsManagement() {
   const [wordInput, setWordInput] = useState('');
   const [message, setMessage] = useState({ text: '', type: '' }); // type: 'success' | 'error' | ''
+  const [refreshKey, setRefreshKey] = useState(0);
 
   /**
    * Handle form submission to add a new word
@@ -50,6 +52,7 @@ function WordsManagement() {
     if (saved) {
       setMessage({ text: `Great! "${trimmedWord}" has been added!`, type: 'success' });
       setWordInput(''); // Clear input field
+      setRefreshKey(prev => prev + 1); // Trigger WordsList refresh
     } else {
       setMessage({ text: 'Oops! Could not save the word. Please try again.', type: 'error' });
     }
@@ -91,6 +94,10 @@ function WordsManagement() {
           {message.text}
         </div>
       )}
+
+      <hr style={{ margin: '40px 0', border: 'none', borderTop: '2px solid #ddd' }} />
+
+      <WordsList key={refreshKey} />
     </div>
   );
 }

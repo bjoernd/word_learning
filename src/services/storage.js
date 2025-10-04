@@ -3,6 +3,8 @@
  * Handles all localStorage operations for words and scores
  */
 
+import { DEFAULT_WORDS } from '../utils/wordModel';
+
 const STORAGE_KEYS = {
   WORDS: 'wordLearning_words',
   SCORE: 'wordLearning_score',
@@ -16,7 +18,9 @@ export function getWords() {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.WORDS);
     if (!stored) {
-      return [];
+      // Initialize with default words on first run
+      saveWords(DEFAULT_WORDS);
+      return DEFAULT_WORDS;
     }
     const parsed = JSON.parse(stored);
     // Validate that we got an array
