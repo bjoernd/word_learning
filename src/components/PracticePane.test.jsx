@@ -185,8 +185,7 @@ describe('PracticePane', () => {
   });
 
   describe('Form Submission', () => {
-    it('shows placeholder message when submitting', async () => {
-      const user = userEvent.setup();
+    it('shows placeholder message when submitting', () => {
       render(<PracticePane />);
 
       // This will be fully tested in WI-10 when spell checking is implemented

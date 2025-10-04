@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { speakWord, isTTSSupported } from '../services/tts';
 import { getScore, saveScore, getWords } from '../services/storage';
 import { getRandomWord } from '../utils/wordModel';
@@ -14,6 +14,18 @@ function PracticePane() {
   const [score, setScore] = useState(() => getScore());
   const [feedback, setFeedback] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isShowingFeedback, setIsShowingFeedback] = useState(false);
+
+  const inputRef = useRef(null);
+
+  /**
+   * Auto-focus input when ready for user input
+   */
+  useEffect(() => {
+    if (currentWord && !isShowingFeedback && !isSpeaking && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [currentWord, isShowingFeedback, isSpeaking]);
 
   /**
    * Select and speak the next word for practice
@@ -89,12 +101,22 @@ function PracticePane() {
   };
 
   /**
-   * Handle form submission (to be implemented in later work items)
+   * Handle form submission
+   * Spell checking logic will be added in WI-10
    */
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Spell checking logic will be added in WI-10
-    setFeedback('Submit functionality will be implemented soon!');
+
+    if (!currentWord || !userInput.trim()) {
+      return;
+    }
+
+    // Set feedback state
+    setIsShowingFeedback(true);
+    setFeedback('Checking your spelling... (Full spell checking will be added in WI-10)');
+
+    // Clear input after submission
+    setUserInput('');
   };
 
   /**
@@ -117,6 +139,22 @@ function PracticePane() {
    * Get a new word
    */
   const handleGetWord = () => {
+    selectNextWord();
+  };
+
+  /**
+   * Dismiss feedback and prepare for next word
+   */
+  const handleDismissFeedback = () => {
+    setIsShowingFeedback(false);
+    setFeedback('');
+  };
+
+  /**
+   * Handle "Next Word" button - dismiss feedback and get new word
+   */
+  const handleNextWord = () => {
+    handleDismissFeedback();
     selectNextWord();
   };
 
@@ -178,13 +216,14 @@ function PracticePane() {
           onChange={handleInputChange}
           placeholder="Type the word here..."
           className="spelling-input"
-          disabled={!currentWord}
+          disabled={!currentWord || isShowingFeedback}
+          ref={inputRef}
           aria-label="Spelling input"
         />
         <button
           type="submit"
           className="submit-button"
-          disabled={!currentWord || !userInput.trim()}
+          disabled={!currentWord || !userInput.trim() || isShowingFeedback}
         >
           Submit
         </button>
@@ -194,6 +233,15 @@ function PracticePane() {
       {feedback && (
         <div className="feedback-section" role="alert">
           <p className="feedback-message">{feedback}</p>
+          {isShowingFeedback && (
+            <button
+              onClick={handleNextWord}
+              className="next-word-button"
+              aria-label="Get next word"
+            >
+              Next Word
+            </button>
+          )}
         </div>
       )}
 
