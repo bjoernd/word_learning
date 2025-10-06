@@ -2,12 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import FeedbackDisplay from './FeedbackDisplay';
+import { createSpellCheckResult } from '../test/testUtils';
 
 describe('FeedbackDisplay', () => {
   const mockOnNextWord = vi.fn();
+  let user;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    user = userEvent.setup();
   });
 
   describe('Rendering', () => {
@@ -19,12 +22,7 @@ describe('FeedbackDisplay', () => {
     });
 
     it('renders success message for correct spelling', () => {
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -32,12 +30,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('renders error message for incorrect spelling', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -45,12 +42,7 @@ describe('FeedbackDisplay', () => {
     });
 
     it('renders Next Word button', () => {
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -60,12 +52,7 @@ describe('FeedbackDisplay', () => {
 
   describe('Correct Spelling Display', () => {
     it('does not show spelling comparison for correct answer', () => {
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -74,12 +61,7 @@ describe('FeedbackDisplay', () => {
     });
 
     it('shows success styling for correct answer', () => {
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -90,12 +72,11 @@ describe('FeedbackDisplay', () => {
 
   describe('Incorrect Spelling Display', () => {
     it('shows spelling comparison for incorrect answer', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -104,12 +85,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('shows error styling for incorrect answer', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -118,12 +98,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('displays user answer with individual letters', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -138,12 +117,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('displays correct answer with individual letters', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -158,12 +136,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('applies correct class to correct letters', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'hallo',
-        correctAnswer: 'hello',
         highlights: [false, true, false, false, false],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -179,12 +156,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('applies incorrect class to wrong letters', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'hxllo',
-        correctAnswer: 'hello',
         highlights: [false, true, false, false, false],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -199,12 +175,11 @@ describe('FeedbackDisplay', () => {
 
   describe('Different Lengths', () => {
     it('handles user answer shorter than correct word', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'hel',
-        correctAnswer: 'hello',
         highlights: [false, false, false, true, true],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -220,12 +195,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('displays underscore for missing characters', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'hel',
-        correctAnswer: 'hello',
         highlights: [false, false, false, true, true],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -239,12 +213,11 @@ describe('FeedbackDisplay', () => {
     });
 
     it('handles user answer longer than correct word', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helloo',
-        correctAnswer: 'hello',
         highlights: [false, false, false, false, false, true],
-      };
+      });
 
       const { container } = render(
         <FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />
@@ -262,13 +235,7 @@ describe('FeedbackDisplay', () => {
 
   describe('Next Word Button', () => {
     it('calls onNextWord when clicked', async () => {
-      const user = userEvent.setup();
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -279,12 +246,7 @@ describe('FeedbackDisplay', () => {
     });
 
     it('has proper aria label', () => {
-      const result = {
-        isCorrect: true,
-        userAnswer: 'hello',
-        correctAnswer: 'hello',
-        highlights: [false, false, false, false, false],
-      };
+      const result = createSpellCheckResult();
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 
@@ -294,12 +256,11 @@ describe('FeedbackDisplay', () => {
 
   describe('Accessibility', () => {
     it('has descriptive labels for comparison sections', () => {
-      const result = {
+      const result = createSpellCheckResult({
         isCorrect: false,
         userAnswer: 'helo',
-        correctAnswer: 'hello',
         highlights: [false, false, true, false, false],
-      };
+      });
 
       render(<FeedbackDisplay spellCheckResult={result} onNextWord={mockOnNextWord} />);
 

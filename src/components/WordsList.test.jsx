@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import WordsList from './WordsList';
 import * as storage from '../services/storage';
+import { COMMON_WORDS, mockWindowConfirm, mockWindowAlert } from '../test/testUtils';
 
 // Mock the storage module
 vi.mock('../services/storage', () => ({
@@ -11,12 +12,13 @@ vi.mock('../services/storage', () => ({
 }));
 
 describe('WordsList', () => {
+  let user;
+
   beforeEach(() => {
-    // Clear all mocks before each test
     vi.clearAllMocks();
-    // Default mock implementations
     storage.getWords.mockReturnValue([]);
     storage.saveWords.mockReturnValue(true);
+    user = userEvent.setup();
   });
 
   describe('Empty State', () => {
@@ -40,7 +42,7 @@ describe('WordsList', () => {
 
   describe('Word Display', () => {
     it('displays all words from localStorage', () => {
-      storage.getWords.mockReturnValue(['apple', 'banana', 'cherry']);
+      storage.getWords.mockReturnValue(COMMON_WORDS);
 
       render(<WordsList />);
 
@@ -58,7 +60,7 @@ describe('WordsList', () => {
     });
 
     it('displays correct word count for multiple words', () => {
-      storage.getWords.mockReturnValue(['apple', 'banana', 'cherry']);
+      storage.getWords.mockReturnValue(COMMON_WORDS);
 
       render(<WordsList />);
 
@@ -77,11 +79,9 @@ describe('WordsList', () => {
 
   describe('Word Deletion', () => {
     it('deletes word when confirmed', async () => {
-      const user = userEvent.setup();
-      storage.getWords.mockReturnValue(['apple', 'banana', 'cherry']);
+      storage.getWords.mockReturnValue(COMMON_WORDS);
 
-      // Mock window.confirm to return true (confirmed)
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const confirmSpy = mockWindowConfirm(true);
 
       render(<WordsList />);
 
@@ -104,11 +104,9 @@ describe('WordsList', () => {
     });
 
     it('does not delete word when cancelled', async () => {
-      const user = userEvent.setup();
-      storage.getWords.mockReturnValue(['apple', 'banana']);
+      storage.getWords.mockReturnValue(COMMON_WORDS.slice(0, 2));
 
-      // Mock window.confirm to return false (cancelled)
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
+      const confirmSpy = mockWindowConfirm(false);
 
       render(<WordsList />);
 
@@ -127,12 +125,11 @@ describe('WordsList', () => {
     });
 
     it('shows alert when delete fails', async () => {
-      const user = userEvent.setup();
       storage.getWords.mockReturnValue(['apple']);
-      storage.saveWords.mockReturnValue(false); // Simulate save failure
+      storage.saveWords.mockReturnValue(false);
 
-      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-      const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+      const confirmSpy = mockWindowConfirm(true);
+      const alertSpy = mockWindowAlert();
 
       render(<WordsList />);
 
@@ -150,10 +147,9 @@ describe('WordsList', () => {
     });
 
     it('deletes last word and shows empty state', async () => {
-      const user = userEvent.setup();
       storage.getWords.mockReturnValue(['apple']);
 
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      mockWindowConfirm(true);
 
       render(<WordsList />);
 
@@ -166,10 +162,9 @@ describe('WordsList', () => {
     });
 
     it('updates word count after deletion', async () => {
-      const user = userEvent.setup();
-      storage.getWords.mockReturnValue(['apple', 'banana', 'cherry']);
+      storage.getWords.mockReturnValue(COMMON_WORDS);
 
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      mockWindowConfirm(true);
 
       render(<WordsList />);
 

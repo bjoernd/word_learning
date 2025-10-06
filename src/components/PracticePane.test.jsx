@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import PracticePane from './PracticePane';
 import * as tts from '../services/tts';
 import * as storage from '../services/storage';
+import { COMMON_WORDS, SINGLE_WORD, waitForAsync } from '../test/testUtils';
 
 // Mock the services
 vi.mock('../services/tts', () => ({
@@ -18,6 +19,8 @@ vi.mock('../services/storage', () => ({
 }));
 
 describe('PracticePane', () => {
+  let user;
+
   beforeEach(() => {
     vi.clearAllMocks();
     tts.isTTSSupported.mockReturnValue(true);
@@ -25,6 +28,7 @@ describe('PracticePane', () => {
     storage.getScore.mockReturnValue(0);
     storage.saveScore.mockReturnValue(true);
     storage.getWords.mockReturnValue([]);
+    user = userEvent.setup();
   });
 
   describe('Component Rendering', () => {
@@ -83,7 +87,6 @@ describe('PracticePane', () => {
     });
 
     it('resets score to 0 when reset button clicked', async () => {
-      const user = userEvent.setup();
       storage.getScore.mockReturnValue(5);
 
       render(<PracticePane />);
@@ -97,9 +100,8 @@ describe('PracticePane', () => {
     });
 
     it('increments score when correct answer is submitted', async () => {
-      const user = userEvent.setup();
       storage.getScore.mockReturnValue(0);
-      storage.getWords.mockReturnValue(['hello']);
+      storage.getWords.mockReturnValue(SINGLE_WORD);
       storage.saveScore.mockReturnValue(true);
 
       render(<PracticePane />);
@@ -108,8 +110,7 @@ describe('PracticePane', () => {
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
 
-      // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await waitForAsync();
 
       // Type the correct answer
       const input = screen.getByPlaceholderText('Type the word here...');
@@ -125,9 +126,8 @@ describe('PracticePane', () => {
     });
 
     it('does not increment score when incorrect answer is submitted', async () => {
-      const user = userEvent.setup();
       storage.getScore.mockReturnValue(5);
-      storage.getWords.mockReturnValue(['hello']);
+      storage.getWords.mockReturnValue(SINGLE_WORD);
 
       render(<PracticePane />);
 
@@ -135,8 +135,7 @@ describe('PracticePane', () => {
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
 
-      // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await waitForAsync();
 
       // Clear any previous saveScore calls
       storage.saveScore.mockClear();
@@ -155,7 +154,6 @@ describe('PracticePane', () => {
     });
 
     it('persists score to localStorage on each increment', async () => {
-      const user = userEvent.setup();
       storage.getScore.mockReturnValue(3);
       storage.getWords.mockReturnValue(['test']);
       storage.saveScore.mockReturnValue(true);
@@ -165,7 +163,7 @@ describe('PracticePane', () => {
       // Get a word
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await waitForAsync();
 
       // Submit correct answer
       const input = screen.getByPlaceholderText('Type the word here...');
@@ -238,7 +236,6 @@ describe('PracticePane', () => {
 
   describe('TTS Functionality', () => {
     it('shows feedback when no words in database', async () => {
-      const user = userEvent.setup();
       storage.getWords.mockReturnValue([]);
       render(<PracticePane />);
 
@@ -278,7 +275,6 @@ describe('PracticePane', () => {
 
   describe('Get Word Button', () => {
     it('shows feedback when no words available', async () => {
-      const user = userEvent.setup();
       storage.getWords.mockReturnValue([]);
       render(<PracticePane />);
 
@@ -289,7 +285,6 @@ describe('PracticePane', () => {
     });
 
     it('clears user input when Get Word is clicked', async () => {
-      const user = userEvent.setup();
       render(<PracticePane />);
 
       const getWordButton = screen.getByText('Get Word');
@@ -300,7 +295,6 @@ describe('PracticePane', () => {
     });
 
     it('selects and speaks a word when words are available', async () => {
-      const user = userEvent.setup();
       storage.getWords.mockReturnValue(['hello', 'world', 'test']);
       tts.speakWord.mockResolvedValue();
 
@@ -315,16 +309,14 @@ describe('PracticePane', () => {
     });
 
     it('enables buttons after selecting a word', async () => {
-      const user = userEvent.setup();
-      storage.getWords.mockReturnValue(['hello']);
+      storage.getWords.mockReturnValue(SINGLE_WORD);
 
       render(<PracticePane />);
 
       const getWordButton = screen.getByText('Get Word');
       await user.click(getWordButton);
 
-      // Wait for async operations
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await waitForAsync();
 
       // Buttons should be enabled after word is selected
       const speakButton = screen.getByText('Speak Word');
@@ -355,7 +347,6 @@ describe('PracticePane', () => {
     });
 
     it('uses role="alert" for feedback messages', async () => {
-      const user = userEvent.setup();
       render(<PracticePane />);
 
       const resetButton = screen.getByText('Reset Score');

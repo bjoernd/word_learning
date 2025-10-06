@@ -8,6 +8,7 @@ import {
   isSpeaking,
   initializeVoices,
 } from './tts';
+import { createMockSpeechSynthesis, cleanupMockSpeechSynthesis, createMockVoices } from '../test/testUtils';
 
 describe('TTS Service', () => {
   let mockSpeechSynthesis;
@@ -15,58 +16,15 @@ describe('TTS Service', () => {
   let mockVoices;
 
   beforeEach(() => {
-    // Create mock voices
-    mockVoices = [
-      { name: 'Google US English', lang: 'en-US' },
-      { name: 'Google UK English Female', lang: 'en-GB' },
-      { name: 'Samantha', lang: 'en-US' },
-      { name: 'French Voice', lang: 'fr-FR' },
-    ];
-
-    // Mock SpeechSynthesisUtterance
-    mockUtterance = {
-      text: '',
-      voice: null,
-      rate: 1,
-      pitch: 1,
-      volume: 1,
-      onend: null,
-      onerror: null,
-    };
-
-    global.SpeechSynthesisUtterance = vi.fn((text) => {
-      mockUtterance.text = text;
-      return mockUtterance;
-    });
-
-    // Mock speechSynthesis
-    mockSpeechSynthesis = {
-      speaking: false,
-      getVoices: vi.fn(() => mockVoices),
-      speak: vi.fn((utterance) => {
-        mockSpeechSynthesis.speaking = true;
-        // Simulate successful speech
-        setTimeout(() => {
-          mockSpeechSynthesis.speaking = false;
-          if (utterance.onend) {
-            utterance.onend();
-          }
-        }, 10);
-      }),
-      cancel: vi.fn(() => {
-        mockSpeechSynthesis.speaking = false;
-      }),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    };
-
-    global.window.speechSynthesis = mockSpeechSynthesis;
+    mockVoices = createMockVoices();
+    const mocks = createMockSpeechSynthesis(mockVoices);
+    mockSpeechSynthesis = mocks.mockSpeechSynthesis;
+    mockUtterance = mocks.mockUtterance;
   });
 
   afterEach(() => {
     vi.clearAllMocks();
-    delete global.SpeechSynthesisUtterance;
-    delete global.window.speechSynthesis;
+    cleanupMockSpeechSynthesis();
   });
 
   describe('isTTSSupported', () => {
@@ -160,7 +118,8 @@ describe('TTS Service', () => {
       await speakWord('hello');
 
       expect(mockSpeechSynthesis.speak).toHaveBeenCalled();
-      expect(mockUtterance.text).toBe('hello');
+      // The implementation adds '... ' prefix to prevent audio clipping
+      expect(mockUtterance.text).toBe('... hello');
     });
 
     it('uses kid-friendly default settings', async () => {
@@ -189,7 +148,8 @@ describe('TTS Service', () => {
     it('trims whitespace from word', async () => {
       await speakWord('  hello  ');
 
-      expect(mockUtterance.text).toBe('hello');
+      // The implementation adds '... ' prefix to prevent audio clipping
+      expect(mockUtterance.text).toBe('... hello');
     });
 
     it('rejects when TTS is not supported', async () => {
