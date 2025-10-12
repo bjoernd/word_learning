@@ -19,6 +19,7 @@ export function Practice() {
   const [userInput, setUserInput] = useState('');
   const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sessionStarted, setSessionStarted] = useState(false);
 
   const playWord = useCallback(async (word: string) => {
     try {
@@ -43,16 +44,20 @@ export function Practice() {
     setAnswers([]);
     setUserInput('');
     setFeedback(null);
+    setSessionStarted(false);
     setIsLoading(false);
-
-    if (words.length > 0) {
-      playWord(words[0].word);
-    }
-  }, [playWord]);
+  }, []);
 
   useEffect(() => {
     startSession();
   }, [startSession]);
+
+  const handleStart = () => {
+    setSessionStarted(true);
+    if (sessionWords[currentIndex]) {
+      playWord(sessionWords[currentIndex].word);
+    }
+  };
 
   const handleReplay = () => {
     if (sessionWords[currentIndex]) {
@@ -183,6 +188,20 @@ export function Practice() {
 
   const score = calculateScore(answers);
   const lastAnswer = answers[answers.length - 1];
+
+  if (!sessionStarted) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.startPrompt}>
+          <h2>Ready to Practice?</h2>
+          <p>Click Start to hear the first word.</p>
+          <button onClick={handleStart} className={styles.startButton}>
+            Start Practice
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
