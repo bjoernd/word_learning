@@ -1,45 +1,38 @@
 # Detailed Technical Implementation Plan
 
-## Phase 1: Project Initialization and Setup
+## Test-Driven Development Approach
 
-### Commands to Execute
+This plan follows strict TDD principles:
+1. **Write tests first** - Define expected behavior through tests
+2. **Implement minimal code** - Write only what's needed to pass tests
+3. **Refactor** - Remove duplication and improve code quality
+4. **Validate** - Run tests, build, and linting after each phase
 
-```bash
-# Initialize Vite project
-npm create vite@latest . -- --template react-ts
+Every phase follows this pattern:
+- Write failing tests
+- Implement code to make tests pass
+- Run full validation (tests + build + lint)
+- Commit when all checks pass
 
-# Install dependencies
-npm install
+## Phase 1: Project Initialization and Setup ✅
 
-# Install Dexie
-npm install dexie dexie-react-hooks
+**Status**: COMPLETED
 
-# Install dev dependencies
-npm install -D @types/node
+Already done:
+- Vite project initialized with React + TypeScript
+- Dependencies installed (dexie, dexie-react-hooks, vitest, testing-library)
+- Project structure created
+
+### Remaining Setup
+
+Create test setup file:
+
+**File**: `src/test/setup.ts`
+```typescript
+import '@testing-library/jest-dom'
 ```
 
-### Project Structure to Create
-
-```
-src/
-├── components/
-│   ├── Practice/
-│   ├── WordManager/
-│   └── shared/
-├── services/
-│   ├── database.ts
-│   └── speech.ts
-├── types/
-│   └── index.ts
-├── App.tsx
-├── App.module.css
-└── main.tsx
-```
-
-### Configuration Files
-
-#### Update `vite.config.ts`
-
+Update `vite.config.ts` to include test configuration:
 ```typescript
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -49,52 +42,23 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
   }
 })
 ```
 
-#### Update `tsconfig.json` (ensure strict mode)
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}
-```
-
-### Validation
-
+**Validation**:
 ```bash
+npm test
 npm run build
 npm run lint
 ```
 
-**Success Criteria**: Build succeeds with no errors, linter shows no warnings/errors
-
-✅ **Phase 1: COMPLETED**
-
 ---
 
-## Phase 2: Database Layer Implementation
+## Phase 2: Core Types
 
-### File: `src/types/index.ts`
+**File**: `src/types/index.ts`
 
 ```typescript
 export interface Word {
@@ -107,16 +71,111 @@ export interface PracticeWord {
   userAnswer: string;
   isCorrect: boolean;
 }
-
-export interface SessionState {
-  words: Word[];
-  currentIndex: number;
-  answers: PracticeWord[];
-  isComplete: boolean;
-}
 ```
 
-### File: `src/services/database.ts`
+**TDD Note**: Types are compile-time only - no runtime tests needed.
+
+---
+
+## Phase 3: Database Tests (Write First!)
+
+**File**: `src/services/database.test.ts`
+
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { db, addWord, deleteWord, getAllWords, getWordCount, getRandomWords } from './database';
+
+describe('Database Operations', () => {
+  beforeEach(async () => {
+    await db.words.clear();
+  });
+
+  afterEach(async () => {
+    await db.words.clear();
+  });
+
+  describe('addWord', () => {
+    it('should add a word and return its id', async () => {
+      const id = await addWord('test');
+      expect(id).toBeGreaterThan(0);
+    });
+
+    it('should store the word text correctly', async () => {
+      const id = await addWord('hello');
+      const word = await db.words.get(id);
+      expect(word?.word).toBe('hello');
+    });
+  });
+
+  describe('getAllWords', () => {
+    it('should return empty array when no words exist', async () => {
+      const words = await getAllWords();
+      expect(words).toEqual([]);
+    });
+
+    it('should retrieve all words', async () => {
+      await addWord('word1');
+      await addWord('word2');
+      const words = await getAllWords();
+      expect(words).toHaveLength(2);
+    });
+  });
+
+  describe('getWordCount', () => {
+    it('should return 0 when database is empty', async () => {
+      const count = await getWordCount();
+      expect(count).toBe(0);
+    });
+
+    it('should return correct count', async () => {
+      await addWord('word1');
+      await addWord('word2');
+      const count = await getWordCount();
+      expect(count).toBe(2);
+    });
+  });
+
+  describe('deleteWord', () => {
+    it('should delete a word by id', async () => {
+      const id = await addWord('test');
+      await deleteWord(id);
+      const words = await getAllWords();
+      expect(words).toHaveLength(0);
+    });
+  });
+
+  describe('getRandomWords', () => {
+    it('should return empty array when database is empty', async () => {
+      const random = await getRandomWords(5);
+      expect(random).toEqual([]);
+    });
+
+    it('should return all words if fewer than requested', async () => {
+      await addWord('word1');
+      await addWord('word2');
+      const random = await getRandomWords(10);
+      expect(random).toHaveLength(2);
+    });
+
+    it('should return exactly the requested count', async () => {
+      await addWord('word1');
+      await addWord('word2');
+      await addWord('word3');
+      await addWord('word4');
+      const random = await getRandomWords(2);
+      expect(random).toHaveLength(2);
+    });
+  });
+});
+```
+
+**Run tests** - they will fail (this is correct TDD!)
+
+---
+
+## Phase 4: Database Implementation
+
+**File**: `src/services/database.ts`
 
 ```typescript
 import Dexie, { Table } from 'dexie';
@@ -135,10 +194,7 @@ export class WordDatabase extends Dexie {
 
 export const db = new WordDatabase();
 
-// CRUD Operations
-
 export async function addWord(wordText: string): Promise<number> {
-  // Add word without validation
   return await db.words.add({ word: wordText });
 }
 
@@ -157,161 +213,37 @@ export async function getWordCount(): Promise<number> {
 export async function getRandomWords(count: number): Promise<Word[]> {
   const allWords = await db.words.toArray();
 
-  // If fewer words than requested, return all
+  if (allWords.length === 0) {
+    return [];
+  }
+
   if (allWords.length <= count) {
     return allWords;
   }
 
-  // Shuffle and take first 'count' words
-  const shuffled = [...allWords].sort(() => Math.random() - 0.5);
+  // Fisher-Yates shuffle
+  const shuffled = [...allWords];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
   return shuffled.slice(0, count);
 }
 ```
 
-### Testing Approach
-
-Create `src/services/database.test.ts`:
-
-```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { db, addWord, deleteWord, getAllWords, getRandomWords } from './database';
-
-describe('Database Operations', () => {
-  beforeEach(async () => {
-    // Clear database before each test
-    await db.words.clear();
-  });
-
-  it('should add a word', async () => {
-    const id = await addWord('test');
-    expect(id).toBeGreaterThan(0);
-  });
-
-  it('should retrieve all words', async () => {
-    await addWord('word1');
-    await addWord('word2');
-    const words = await getAllWords();
-    expect(words).toHaveLength(2);
-  });
-
-  it('should delete a word', async () => {
-    const id = await addWord('test');
-    await deleteWord(id);
-    const words = await getAllWords();
-    expect(words).toHaveLength(0);
-  });
-
-  it('should return random words', async () => {
-    await addWord('word1');
-    await addWord('word2');
-    await addWord('word3');
-    const random = await getRandomWords(2);
-    expect(random).toHaveLength(2);
-  });
-
-  it('should return all words if fewer than requested', async () => {
-    await addWord('word1');
-    const random = await getRandomWords(10);
-    expect(random).toHaveLength(1);
-  });
-});
-```
-
-### Install Vitest
-
+**Validation**:
 ```bash
-npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom
-```
-
-### Update `package.json` scripts
-
-```json
-{
-  "scripts": {
-    "test": "vitest",
-    "test:ui": "vitest --ui"
-  }
-}
-```
-
-### Validation
-
-```bash
-npm test
+npm test     # All tests should pass
 npm run build
 npm run lint
 ```
 
-**Success Criteria**: All tests pass, build succeeds, linter clean
-
 ---
 
-## Phase 3: Text-to-Speech Service
+## Phase 5: Speech Service Tests
 
-### File: `src/services/speech.ts`
-
-```typescript
-export interface SpeechOptions {
-  rate?: number;
-  pitch?: number;
-  volume?: number;
-  lang?: string;
-}
-
-export class SpeechService {
-  private synthesis: SpeechSynthesis;
-  private defaultOptions: Required<SpeechOptions>;
-
-  constructor() {
-    this.synthesis = window.speechSynthesis;
-    this.defaultOptions = {
-      rate: 0.8,
-      pitch: 1,
-      volume: 1,
-      lang: 'en-US'
-    };
-  }
-
-  isSupported(): boolean {
-    return 'speechSynthesis' in window;
-  }
-
-  speak(text: string, options?: SpeechOptions): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!this.isSupported()) {
-        reject(new Error('Speech synthesis not supported'));
-        return;
-      }
-
-      // Cancel any ongoing speech
-      this.synthesis.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      const opts = { ...this.defaultOptions, ...options };
-
-      utterance.rate = opts.rate;
-      utterance.pitch = opts.pitch;
-      utterance.volume = opts.volume;
-      utterance.lang = opts.lang;
-
-      utterance.onend = () => resolve();
-      utterance.onerror = (event) => reject(event);
-
-      this.synthesis.speak(utterance);
-    });
-  }
-
-  cancel(): void {
-    this.synthesis.cancel();
-  }
-}
-
-export const speechService = new SpeechService();
-```
-
-### Testing Approach
-
-Create `src/services/speech.test.ts`:
+**File**: `src/services/speech.test.ts`
 
 ```typescript
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -319,12 +251,16 @@ import { SpeechService } from './speech';
 
 describe('SpeechService', () => {
   let service: SpeechService;
+  let mockSpeak: ReturnType<typeof vi.fn>;
+  let mockCancel: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Mock speechSynthesis
+    mockSpeak = vi.fn();
+    mockCancel = vi.fn();
+
     global.speechSynthesis = {
-      speak: vi.fn(),
-      cancel: vi.fn(),
+      speak: mockSpeak,
+      cancel: mockCancel,
     } as any;
 
     service = new SpeechService();
@@ -336,135 +272,241 @@ describe('SpeechService', () => {
 
   it('should cancel ongoing speech', () => {
     service.cancel();
-    expect(global.speechSynthesis.cancel).toHaveBeenCalled();
+    expect(mockCancel).toHaveBeenCalled();
+  });
+
+  it('should call speechSynthesis.speak', async () => {
+    const speakPromise = service.speak('hello');
+
+    expect(mockSpeak).toHaveBeenCalled();
+    const utterance = mockSpeak.mock.calls[0][0] as SpeechSynthesisUtterance;
+    expect(utterance.text).toBe('hello');
+
+    utterance.onend?.(new Event('end'));
+    await expect(speakPromise).resolves.toBeUndefined();
   });
 });
 ```
 
-### Validation
+---
 
+## Phase 6: Speech Service Implementation
+
+**File**: `src/services/speech.ts`
+
+```typescript
+export class SpeechService {
+  private synthesis: SpeechSynthesis | undefined;
+
+  constructor() {
+    this.synthesis = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+  }
+
+  isSupported(): boolean {
+    return typeof window !== 'undefined' && 'speechSynthesis' in window;
+  }
+
+  speak(text: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.isSupported() || !this.synthesis) {
+        reject(new Error('Speech synthesis not supported'));
+        return;
+      }
+
+      this.synthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8;
+
+      utterance.onend = () => resolve();
+      utterance.onerror = (event) => reject(event);
+
+      this.synthesis.speak(utterance);
+    });
+  }
+
+  cancel(): void {
+    if (this.synthesis) {
+      this.synthesis.cancel();
+    }
+  }
+}
+
+export const speechService = new SpeechService();
+```
+
+**Validation**:
 ```bash
 npm test
 npm run build
 npm run lint
 ```
 
-**Success Criteria**: All tests pass, build succeeds, linter clean
+---
+
+## Phase 7: Practice Logic Tests
+
+**File**: `src/services/practiceLogic.test.ts`
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { isAnswerCorrect, calculateScore, compareAnswers } from './practiceLogic';
+import { PracticeWord } from '../types';
+
+describe('Practice Logic', () => {
+  describe('isAnswerCorrect', () => {
+    it('should match case-insensitively', () => {
+      expect(isAnswerCorrect('Apple', 'apple')).toBe(true);
+      expect(isAnswerCorrect('HELLO', 'hello')).toBe(true);
+    });
+
+    it('should detect incorrect answers', () => {
+      expect(isAnswerCorrect('apple', 'aple')).toBe(false);
+      expect(isAnswerCorrect('test', 'fest')).toBe(false);
+    });
+
+    it('should handle empty strings', () => {
+      expect(isAnswerCorrect('', '')).toBe(true);
+      expect(isAnswerCorrect('word', '')).toBe(false);
+    });
+  });
+
+  describe('calculateScore', () => {
+    it('should count correct answers', () => {
+      const answers: PracticeWord[] = [
+        { word: { word: 'test' }, userAnswer: 'test', isCorrect: true },
+        { word: { word: 'test2' }, userAnswer: 'wrong', isCorrect: false },
+        { word: { word: 'test3' }, userAnswer: 'test3', isCorrect: true },
+      ];
+      expect(calculateScore(answers)).toBe(2);
+    });
+
+    it('should return 0 for empty answers', () => {
+      expect(calculateScore([])).toBe(0);
+    });
+
+    it('should return 0 when all wrong', () => {
+      const answers: PracticeWord[] = [
+        { word: { word: 'test' }, userAnswer: 'wrong', isCorrect: false },
+      ];
+      expect(calculateScore(answers)).toBe(0);
+    });
+  });
+
+  describe('compareAnswers', () => {
+    it('should return matching for correct answers', () => {
+      const result = compareAnswers('apple', 'apple');
+      expect(result).toEqual(['match', 'match', 'match', 'match', 'match']);
+    });
+
+    it('should be case-insensitive', () => {
+      const result = compareAnswers('Apple', 'APPLE');
+      expect(result).toEqual(['match', 'match', 'match', 'match', 'match']);
+    });
+
+    it('should detect wrong characters', () => {
+      const result = compareAnswers('apple', 'apqle');
+      expect(result).toEqual(['match', 'match', 'wrong', 'match', 'match']);
+    });
+
+    it('should detect missing characters', () => {
+      const result = compareAnswers('apple', 'aple');
+      expect(result).toEqual(['match', 'match', 'missing', 'match', 'match']);
+    });
+
+    it('should detect extra characters', () => {
+      const result = compareAnswers('apple', 'appple');
+      expect(result).toEqual(['match', 'match', 'match', 'extra', 'match', 'match']);
+    });
+
+    it('should handle user answer longer than correct word', () => {
+      const result = compareAnswers('cat', 'catch');
+      expect(result).toEqual(['match', 'match', 'match', 'extra', 'extra']);
+    });
+
+    it('should handle user answer shorter than correct word', () => {
+      const result = compareAnswers('hello', 'hel');
+      expect(result).toEqual(['match', 'match', 'match', 'missing', 'missing']);
+    });
+
+    it('should handle completely wrong answer', () => {
+      const result = compareAnswers('abc', 'xyz');
+      expect(result).toEqual(['wrong', 'wrong', 'wrong']);
+    });
+
+    it('should handle empty user answer', () => {
+      const result = compareAnswers('cat', '');
+      expect(result).toEqual(['missing', 'missing', 'missing']);
+    });
+  });
+});
+```
 
 ---
 
-## Phase 4: Main App Structure and Navigation
+## Phase 8: Practice Logic Implementation
 
-### File: `src/App.tsx`
+**File**: `src/services/practiceLogic.ts`
 
 ```typescript
-import { useState } from 'react';
-import styles from './App.module.css';
+import { PracticeWord } from '../types';
 
-type TabType = 'practice' | 'manage';
+export type CharacterMatch = 'match' | 'wrong' | 'missing' | 'extra';
 
-function App() {
-  const [activeTab, setActiveTab] = useState<TabType>('practice');
-
-  return (
-    <div className={styles.app}>
-      <header className={styles.header}>
-        <h1>Word Learning</h1>
-        <nav className={styles.nav}>
-          <button
-            className={activeTab === 'practice' ? styles.active : ''}
-            onClick={() => setActiveTab('practice')}
-          >
-            Practice
-          </button>
-          <button
-            className={activeTab === 'manage' ? styles.active : ''}
-            onClick={() => setActiveTab('manage')}
-          >
-            Manage Words
-          </button>
-        </nav>
-      </header>
-      <main className={styles.main}>
-        {activeTab === 'practice' && <div>Practice View</div>}
-        {activeTab === 'manage' && <div>Manage Words View</div>}
-      </main>
-    </div>
-  );
+export function isAnswerCorrect(correctWord: string, userAnswer: string): boolean {
+  return correctWord.toLowerCase() === userAnswer.toLowerCase();
 }
 
-export default App;
-```
-
-### File: `src/App.module.css`
-
-```css
-.app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+export function calculateScore(answers: PracticeWord[]): number {
+  return answers.filter(a => a.isCorrect).length;
 }
 
-.header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 1rem 2rem;
-}
+export function compareAnswers(correctWord: string, userAnswer: string): CharacterMatch[] {
+  const correct = correctWord.toLowerCase();
+  const user = userAnswer.toLowerCase();
+  const maxLength = Math.max(correct.length, user.length);
+  const result: CharacterMatch[] = [];
 
-.header h1 {
-  margin: 0 0 1rem 0;
-  font-size: 1.5rem;
-}
+  for (let i = 0; i < maxLength; i++) {
+    const correctChar = correct[i];
+    const userChar = user[i];
 
-.nav {
-  display: flex;
-  gap: 1rem;
-}
+    if (correctChar === undefined) {
+      // User added extra character
+      result.push('extra');
+    } else if (userChar === undefined) {
+      // User is missing a character
+      result.push('missing');
+    } else if (correctChar === userChar) {
+      // Characters match
+      result.push('match');
+    } else {
+      // Wrong character
+      result.push('wrong');
+    }
+  }
 
-.nav button {
-  padding: 0.5rem 1rem;
-  border: none;
-  background-color: #34495e;
-  color: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.nav button:hover {
-  background-color: #4a6278;
-}
-
-.nav button.active {
-  background-color: #3498db;
-}
-
-.main {
-  flex: 1;
-  padding: 2rem;
+  return result;
 }
 ```
 
-### Validation
-
+**Validation**:
 ```bash
-npm run dev  # Manually test navigation
+npm test
 npm run build
 npm run lint
 ```
 
-**Success Criteria**: Can switch between tabs, build succeeds, linter clean
-
 ---
 
-## Phase 5: Word Management View
+## Phase 9: Word Manager Component
 
-### File: `src/components/WordManager/WordManager.tsx`
+**File**: `src/components/WordManager/WordManager.tsx`
 
 ```typescript
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addWord, deleteWord } from '../../services/database';
-import { Word } from '../../types';
 import styles from './WordManager.module.css';
 
 export function WordManager() {
@@ -472,8 +514,9 @@ export function WordManager() {
   const words = useLiveQuery(() => db.words.toArray()) ?? [];
 
   const handleAddWord = async () => {
-    if (inputValue.trim()) {
-      await addWord(inputValue.trim());
+    const trimmed = inputValue.trim();
+    if (trimmed) {
+      await addWord(trimmed);
       setInputValue('');
     }
   };
@@ -500,6 +543,7 @@ export function WordManager() {
           onKeyPress={handleKeyPress}
           placeholder="Enter a word"
           className={styles.input}
+          aria-label="New word to add"
         />
         <button onClick={handleAddWord} className={styles.addButton}>
           Add Word
@@ -508,16 +552,17 @@ export function WordManager() {
 
       {words.length === 0 ? (
         <p className={styles.emptyMessage}>
-          No words yet. Add some words to start practicing!
+          No words yet. Add some words to start practicing.
         </p>
       ) : (
         <ul className={styles.wordList}>
-          {words.map((word) => (
+          {words.sort((a, b) => a.word.localeCompare(b.word)).map((word) => (
             <li key={word.id} className={styles.wordItem}>
               <span className={styles.wordText}>{word.word}</span>
               <button
                 onClick={() => handleDeleteWord(word.id!)}
                 className={styles.deleteButton}
+                aria-label={`Delete word ${word.word}`}
               >
                 Delete
               </button>
@@ -530,7 +575,7 @@ export function WordManager() {
 }
 ```
 
-### File: `src/components/WordManager/WordManager.module.css`
+**File**: `src/components/WordManager/WordManager.module.css`
 
 ```css
 .container {
@@ -546,14 +591,14 @@ export function WordManager() {
 
 .input {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
 }
 
 .addButton {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background-color: #3498db;
   color: white;
   border: none;
@@ -568,7 +613,6 @@ export function WordManager() {
 .emptyMessage {
   text-align: center;
   color: #7f8c8d;
-  font-style: italic;
 }
 
 .wordList {
@@ -591,7 +635,7 @@ export function WordManager() {
 }
 
 .deleteButton {
-  padding: 0.25rem 0.75rem;
+  padding: 0.5rem 1rem;
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -604,192 +648,39 @@ export function WordManager() {
 }
 ```
 
-### Update `src/App.tsx`
-
-```typescript
-import { WordManager } from './components/WordManager/WordManager';
-
-// In the main section:
-{activeTab === 'manage' && <WordManager />}
-```
-
-### Validation
-
+**Validation**:
 ```bash
-npm test
+npm run dev  # Manual test: add/delete words
 npm run build
 npm run lint
 ```
 
-**Success Criteria**: Can add/delete words, words persist, tests pass, linter clean
-
 ---
 
-## Phase 6: Practice Session Core Logic
+## Phase 10: Practice Component
 
-### File: `src/services/practiceLogic.ts`
-
-```typescript
-import { Word, PracticeWord } from '../types';
-
-export interface CharacterComparison {
-  correct: string;
-  user: string;
-  differences: CharacterDifference[];
-}
-
-export interface CharacterDifference {
-  index: number;
-  type: 'missing' | 'extra' | 'wrong';
-  correctChar?: string;
-  userChar?: string;
-}
-
-export function compareAnswers(
-  correctWord: string,
-  userAnswer: string
-): CharacterComparison {
-  const correct = correctWord.toLowerCase();
-  const user = userAnswer.toLowerCase();
-  const differences: CharacterDifference[] = [];
-
-  const maxLength = Math.max(correct.length, user.length);
-
-  for (let i = 0; i < maxLength; i++) {
-    const correctChar = correct[i];
-    const userChar = user[i];
-
-    if (correctChar === undefined) {
-      // User added extra characters
-      differences.push({
-        index: i,
-        type: 'extra',
-        userChar: userChar
-      });
-    } else if (userChar === undefined) {
-      // User is missing characters
-      differences.push({
-        index: i,
-        type: 'missing',
-        correctChar: correctChar
-      });
-    } else if (correctChar !== userChar) {
-      // Wrong character
-      differences.push({
-        index: i,
-        type: 'wrong',
-        correctChar: correctChar,
-        userChar: userChar
-      });
-    }
-  }
-
-  return {
-    correct: correctWord,
-    user: userAnswer,
-    differences
-  };
-}
-
-export function isAnswerCorrect(correctWord: string, userAnswer: string): boolean {
-  return correctWord.toLowerCase() === userAnswer.toLowerCase();
-}
-
-export function calculateScore(answers: PracticeWord[]): number {
-  return answers.filter(a => a.isCorrect).length;
-}
-```
-
-### File: `src/services/practiceLogic.test.ts`
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { compareAnswers, isAnswerCorrect, calculateScore } from './practiceLogic';
-import { PracticeWord } from '../types';
-
-describe('Practice Logic', () => {
-  describe('isAnswerCorrect', () => {
-    it('should match case-insensitively', () => {
-      expect(isAnswerCorrect('Apple', 'apple')).toBe(true);
-      expect(isAnswerCorrect('HELLO', 'hello')).toBe(true);
-    });
-
-    it('should detect incorrect answers', () => {
-      expect(isAnswerCorrect('apple', 'aple')).toBe(false);
-    });
-  });
-
-  describe('compareAnswers', () => {
-    it('should detect missing characters', () => {
-      const result = compareAnswers('apple', 'aple');
-      expect(result.differences).toHaveLength(1);
-      expect(result.differences[0].type).toBe('missing');
-    });
-
-    it('should detect extra characters', () => {
-      const result = compareAnswers('apple', 'appple');
-      expect(result.differences).toHaveLength(1);
-      expect(result.differences[0].type).toBe('extra');
-    });
-
-    it('should detect wrong characters', () => {
-      const result = compareAnswers('apple', 'apqle');
-      expect(result.differences).toHaveLength(1);
-      expect(result.differences[0].type).toBe('wrong');
-    });
-
-    it('should be case insensitive', () => {
-      const result = compareAnswers('Apple', 'APPLE');
-      expect(result.differences).toHaveLength(0);
-    });
-  });
-
-  describe('calculateScore', () => {
-    it('should count correct answers', () => {
-      const answers: PracticeWord[] = [
-        { word: { word: 'test' }, userAnswer: 'test', isCorrect: true },
-        { word: { word: 'test2' }, userAnswer: 'wrong', isCorrect: false }
-      ];
-      expect(calculateScore(answers)).toBe(1);
-    });
-  });
-});
-```
-
-### Validation
-
-```bash
-npm test
-npm run build
-npm run lint
-```
-
-**Success Criteria**: All tests pass, build succeeds, linter clean
-
----
-
-## Phase 7: Practice View UI - Part 1 (Word Presentation)
-
-### File: `src/components/Practice/Practice.tsx`
+**File**: `src/components/Practice/Practice.tsx`
 
 ```typescript
 import { useState, useEffect } from 'react';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
-import { isAnswerCorrect } from '../../services/practiceLogic';
+import { isAnswerCorrect, calculateScore, compareAnswers, CharacterMatch } from '../../services/practiceLogic';
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
+const FEEDBACK_DELAY_MS = 3000;
+
+type FeedbackType = 'correct' | 'incorrect' | null;
 
 export function Practice() {
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<PracticeWord[]>([]);
   const [userInput, setUserInput] = useState('');
+  const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hasEnoughWords, setHasEnoughWords] = useState(true);
 
   useEffect(() => {
     startSession();
@@ -797,12 +688,9 @@ export function Practice() {
 
   const startSession = async () => {
     setIsLoading(true);
-    setError(null);
 
     const wordCount = await getWordCount();
-
     if (wordCount === 0) {
-      setHasEnoughWords(false);
       setIsLoading(false);
       return;
     }
@@ -812,10 +700,9 @@ export function Practice() {
     setCurrentIndex(0);
     setAnswers([]);
     setUserInput('');
-    setHasEnoughWords(true);
+    setFeedback(null);
     setIsLoading(false);
 
-    // Auto-play first word
     if (words.length > 0) {
       playWord(words[0].word);
     }
@@ -836,7 +723,7 @@ export function Practice() {
   };
 
   const handleSubmit = () => {
-    if (!userInput.trim()) return;
+    if (!userInput.trim() || feedback) return;
 
     const currentWord = sessionWords[currentIndex];
     const correct = isAnswerCorrect(currentWord.word, userInput);
@@ -847,8 +734,19 @@ export function Practice() {
       isCorrect: correct
     };
 
-    setAnswers([...answers, practiceWord]);
-    // Will handle feedback and advancement in next phase
+    const newAnswers = [...answers, practiceWord];
+    setAnswers(newAnswers);
+    setFeedback(correct ? 'correct' : 'incorrect');
+
+    setTimeout(() => {
+      setFeedback(null);
+      setUserInput('');
+
+      if (currentIndex + 1 < sessionWords.length) {
+        setCurrentIndex(currentIndex + 1);
+        playWord(sessionWords[currentIndex + 1].word);
+      }
+    }, FEEDBACK_DELAY_MS);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -857,11 +755,63 @@ export function Practice() {
     }
   };
 
+  const renderCharacterComparison = (correctWord: string, userAnswer: string) => {
+    const comparison = compareAnswers(correctWord, userAnswer);
+    const correct = correctWord.toLowerCase();
+    const user = userAnswer.toLowerCase();
+
+    return (
+      <div className={styles.characterComparison}>
+        <div className={styles.comparisonRow}>
+          <span className={styles.label}>Correct:</span>
+          <div className={styles.characters}>
+            {correct.split('').map((char, idx) => (
+              <span
+                key={idx}
+                className={`${styles.char} ${
+                  comparison[idx] === 'match' ? styles.charMatch :
+                  comparison[idx] === 'missing' ? styles.charMissing :
+                  styles.charWrong
+                }`}
+              >
+                {char}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className={styles.comparisonRow}>
+          <span className={styles.label}>Your answer:</span>
+          <div className={styles.characters}>
+            {user.split('').map((char, idx) => (
+              <span
+                key={idx}
+                className={`${styles.char} ${
+                  comparison[idx] === 'match' ? styles.charMatch :
+                  comparison[idx] === 'extra' ? styles.charExtra :
+                  styles.charWrong
+                }`}
+              >
+                {char}
+              </span>
+            ))}
+            {comparison.slice(user.length).map((match, idx) => (
+              match === 'missing' && (
+                <span key={user.length + idx} className={`${styles.char} ${styles.charMissing}`}>
+                  _
+                </span>
+              )
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return <div className={styles.container}>Loading...</div>;
   }
 
-  if (!hasEnoughWords) {
+  if (sessionWords.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
@@ -872,8 +822,29 @@ export function Practice() {
     );
   }
 
-  const currentWord = sessionWords[currentIndex];
-  const score = answers.filter(a => a.isCorrect).length;
+  const isSessionComplete = answers.length === sessionWords.length;
+
+  if (isSessionComplete) {
+    const score = calculateScore(answers);
+    return (
+      <div className={styles.container}>
+        <div className={styles.summary}>
+          <h2>Session Complete!</h2>
+          <div className={styles.score}>
+            <span className={styles.scoreNumber}>{score}</span>
+            <span> out of </span>
+            <span className={styles.scoreNumber}>{sessionWords.length}</span>
+          </div>
+          <button onClick={startSession} className={styles.restartButton}>
+            Restart
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const score = calculateScore(answers);
+  const lastAnswer = answers[answers.length - 1];
 
   return (
     <div className={styles.container}>
@@ -893,19 +864,41 @@ export function Practice() {
           onKeyPress={handleKeyPress}
           placeholder="Type the word you heard"
           className={styles.input}
+          disabled={feedback !== null}
           autoFocus
         />
 
-        <button onClick={handleSubmit} className={styles.submitButton}>
+        <button
+          onClick={handleSubmit}
+          className={styles.submitButton}
+          disabled={feedback !== null}
+        >
           Submit
         </button>
+
+        {feedback && (
+          <div className={feedback === 'correct' ? styles.correct : styles.incorrect}>
+            {feedback === 'correct' ? (
+              <>
+                <div className={styles.icon}>✓</div>
+                <div className={styles.message}>Correct!</div>
+              </>
+            ) : (
+              <>
+                <div className={styles.icon}>✗</div>
+                <div className={styles.message}>Incorrect</div>
+                {renderCharacterComparison(lastAnswer.word.word, lastAnswer.userAnswer)}
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 ```
 
-### File: `src/components/Practice/Practice.module.css`
+**File**: `src/components/Practice/Practice.module.css`
 
 ```css
 .container {
@@ -956,6 +949,10 @@ export function Practice() {
   border-color: #3498db;
 }
 
+.input:disabled {
+  background-color: #ecf0f1;
+}
+
 .submitButton {
   padding: 0.75rem 2rem;
   font-size: 1.1rem;
@@ -966,8 +963,13 @@ export function Practice() {
   cursor: pointer;
 }
 
-.submitButton:hover {
+.submitButton:hover:not(:disabled) {
   background-color: #27ae60;
+}
+
+.submitButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
 }
 
 .emptyState {
@@ -980,115 +982,22 @@ export function Practice() {
   color: #7f8c8d;
   margin-bottom: 1rem;
 }
-```
 
-### Update `src/App.tsx`
-
-```typescript
-import { Practice } from './components/Practice/Practice';
-
-// In the main section:
-{activeTab === 'practice' && <Practice />}
-```
-
-### Validation
-
-```bash
-npm run dev  # Manual test: hear words, enter answers
-npm run build
-npm run lint
-```
-
-**Success Criteria**: Can hear words, replay works, input works, build succeeds, linter clean
-
----
-
-## Phase 8: Practice View UI - Part 2 (Feedback)
-
-### File: `src/components/Practice/Feedback.tsx`
-
-```typescript
-import { CharacterComparison } from '../../services/practiceLogic';
-import styles from './Feedback.module.css';
-
-interface FeedbackProps {
-  isCorrect: boolean;
-  comparison?: CharacterComparison;
-}
-
-export function Feedback({ isCorrect, comparison }: FeedbackProps) {
-  if (isCorrect) {
-    return (
-      <div className={styles.feedback}>
-        <div className={styles.correct}>
-          <div className={styles.icon}>✓</div>
-          <div className={styles.message}>Correct!</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!comparison) return null;
-
-  return (
-    <div className={styles.feedback}>
-      <div className={styles.incorrect}>
-        <div className={styles.icon}>✗</div>
-        <div className={styles.message}>Incorrect</div>
-
-        <div className={styles.comparison}>
-          <div className={styles.comparisonRow}>
-            <span className={styles.label}>Correct:</span>
-            <span className={styles.word}>{comparison.correct}</span>
-          </div>
-          <div className={styles.comparisonRow}>
-            <span className={styles.label}>Your answer:</span>
-            <span className={styles.word}>{comparison.user}</span>
-          </div>
-
-          {comparison.differences.length > 0 && (
-            <div className={styles.differences}>
-              <div className={styles.differencesTitle}>Differences:</div>
-              <ul className={styles.differencesList}>
-                {comparison.differences.map((diff, idx) => (
-                  <li key={idx} className={styles.differenceItem}>
-                    {diff.type === 'missing' && (
-                      <span>Position {diff.index + 1}: Missing '{diff.correctChar}'</span>
-                    )}
-                    {diff.type === 'extra' && (
-                      <span>Position {diff.index + 1}: Extra '{diff.userChar}'</span>
-                    )}
-                    {diff.type === 'wrong' && (
-                      <span>Position {diff.index + 1}: Wrong character (expected '{diff.correctChar}', got '{diff.userChar}')</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
-### File: `src/components/Practice/Feedback.module.css`
-
-```css
-.feedback {
-  margin-top: 2rem;
+.correct, .incorrect {
+  text-align: center;
   padding: 2rem;
   border-radius: 8px;
+  width: 100%;
 }
 
 .correct {
-  text-align: center;
   color: #27ae60;
+  background-color: #d5f4e6;
 }
 
 .incorrect {
   color: #e74c3c;
+  background-color: #fadbd8;
 }
 
 .icon {
@@ -1102,165 +1011,63 @@ export function Feedback({ isCorrect, comparison }: FeedbackProps) {
   margin-bottom: 1.5rem;
 }
 
-.comparison {
-  background-color: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
+.characterComparison {
   margin-top: 1rem;
 }
 
 .comparisonRow {
   display: flex;
+  align-items: center;
   gap: 1rem;
-  margin-bottom: 0.75rem;
-  font-size: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .label {
   font-weight: bold;
   color: #2c3e50;
+  min-width: 100px;
+  text-align: right;
 }
 
-.word {
-  font-family: monospace;
-  font-size: 1.2rem;
-}
-
-.differences {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #dee2e6;
-}
-
-.differencesTitle {
-  font-weight: bold;
-  margin-bottom: 0.75rem;
-  color: #2c3e50;
-}
-
-.differencesList {
-  list-style: none;
-  padding: 0;
-}
-
-.differenceItem {
-  padding: 0.5rem;
-  background-color: #fff;
-  border-left: 3px solid #e74c3c;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
-}
-```
-
-### Update `src/components/Practice/Practice.tsx`
-
-Add state for feedback:
-
-```typescript
-import { Feedback } from './Feedback';
-import { compareAnswers } from '../../services/practiceLogic';
-
-// Add state
-const [showFeedback, setShowFeedback] = useState(false);
-const [currentComparison, setCurrentComparison] = useState<CharacterComparison | null>(null);
-
-// Update handleSubmit
-const handleSubmit = () => {
-  if (!userInput.trim()) return;
-
-  const currentWord = sessionWords[currentIndex];
-  const correct = isAnswerCorrect(currentWord.word, userInput);
-
-  const practiceWord: PracticeWord = {
-    word: currentWord,
-    userAnswer: userInput,
-    isCorrect: correct
-  };
-
-  const newAnswers = [...answers, practiceWord];
-  setAnswers(newAnswers);
-
-  if (!correct) {
-    const comparison = compareAnswers(currentWord.word, userInput);
-    setCurrentComparison(comparison);
-  }
-
-  setShowFeedback(true);
-
-  // Auto-advance after 3 seconds
-  setTimeout(() => {
-    setShowFeedback(false);
-    setCurrentComparison(null);
-    setUserInput('');
-
-    if (currentIndex + 1 < sessionWords.length) {
-      setCurrentIndex(currentIndex + 1);
-      playWord(sessionWords[currentIndex + 1].word);
-    }
-  }, 3000);
-};
-
-// Add to render:
-{showFeedback && (
-  <Feedback
-    isCorrect={answers[answers.length - 1]?.isCorrect ?? false}
-    comparison={currentComparison ?? undefined}
-  />
-)}
-```
-
-### Validation
-
-```bash
-npm run dev  # Manual test: submit answers, see feedback
-npm run build
-npm run lint
-```
-
-**Success Criteria**: Feedback displays correctly, auto-advances, build succeeds, linter clean
-
----
-
-## Phase 9: Session Summary and Restart
-
-### File: `src/components/Practice/Summary.tsx`
-
-```typescript
-import styles from './Summary.module.css';
-
-interface SummaryProps {
-  score: number;
-  total: number;
-  onRestart: () => void;
-}
-
-export function Summary({ score, total, onRestart }: SummaryProps) {
-  return (
-    <div className={styles.container}>
-      <div className={styles.summary}>
-        <h2 className={styles.title}>Session Complete!</h2>
-        <div className={styles.score}>
-          <span className={styles.scoreNumber}>{score}</span>
-          <span className={styles.scoreDivider}> out of </span>
-          <span className={styles.scoreNumber}>{total}</span>
-        </div>
-        <button onClick={onRestart} className={styles.restartButton}>
-          Restart
-        </button>
-      </div>
-    </div>
-  );
-}
-```
-
-### File: `src/components/Practice/Summary.module.css`
-
-```css
-.container {
+.characters {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
+  gap: 0.25rem;
+  font-family: monospace;
+  font-size: 1.5rem;
+}
+
+.char {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  min-width: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.charMatch {
+  background-color: #d5f4e6;
+  color: #27ae60;
+  border: 2px solid #27ae60;
+}
+
+.charWrong {
+  background-color: #fadbd8;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+}
+
+.charMissing {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 2px dashed #856404;
+}
+
+.charExtra {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 2px solid #721c24;
+  text-decoration: line-through;
 }
 
 .summary {
@@ -1268,10 +1075,9 @@ export function Summary({ score, total, onRestart }: SummaryProps) {
   padding: 3rem;
   background-color: #f8f9fa;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.title {
+.summary h2 {
   font-size: 2rem;
   color: #2c3e50;
   margin-bottom: 2rem;
@@ -1280,17 +1086,12 @@ export function Summary({ score, total, onRestart }: SummaryProps) {
 .score {
   font-size: 1.5rem;
   margin-bottom: 2rem;
-  color: #34495e;
 }
 
 .scoreNumber {
   font-size: 2.5rem;
   font-weight: bold;
   color: #3498db;
-}
-
-.scoreDivider {
-  font-size: 1.5rem;
 }
 
 .restartButton {
@@ -1308,406 +1109,160 @@ export function Summary({ score, total, onRestart }: SummaryProps) {
 }
 ```
 
-### Update `src/components/Practice/Practice.tsx`
+---
 
-Add session completion logic:
+## Phase 11: Main App
+
+**File**: `src/App.tsx`
 
 ```typescript
-import { Summary } from './Summary';
+import { useState } from 'react';
+import { Practice } from './components/Practice/Practice';
+import { WordManager } from './components/WordManager/WordManager';
+import styles from './App.module.css';
 
-// Check if session is complete
-const isSessionComplete = answers.length === sessionWords.length;
+type TabType = 'practice' | 'manage';
 
-// In render, show summary if complete:
-if (isSessionComplete) {
-  const finalScore = answers.filter(a => a.isCorrect).length;
+function App() {
+  const [activeTab, setActiveTab] = useState<TabType>('practice');
+
   return (
-    <div className={styles.container}>
-      <Summary
-        score={finalScore}
-        total={sessionWords.length}
-        onRestart={startSession}
-      />
+    <div className={styles.app}>
+      <header className={styles.header}>
+        <h1>Word Learning</h1>
+        <nav className={styles.nav}>
+          <button
+            className={activeTab === 'practice' ? styles.active : ''}
+            onClick={() => setActiveTab('practice')}
+          >
+            Practice
+          </button>
+          <button
+            className={activeTab === 'manage' ? styles.active : ''}
+            onClick={() => setActiveTab('manage')}
+          >
+            Manage Words
+          </button>
+        </nav>
+      </header>
+      <main className={styles.main}>
+        {activeTab === 'practice' && <Practice />}
+        {activeTab === 'manage' && <WordManager />}
+      </main>
     </div>
   );
 }
+
+export default App;
 ```
 
-### Validation
-
-```bash
-npm run dev  # Complete a session, verify summary and restart
-npm run build
-npm run lint
-```
-
-**Success Criteria**: Summary displays after 10 words, restart works, build succeeds, linter clean
-
----
-
-## Phase 10: Integration Testing and Edge Cases
-
-### Manual Test Cases
-
-1. **Empty database flow**:
-   - Clear all words
-   - Navigate to Practice tab
-   - Verify message about adding words appears
-
-2. **Fewer than 10 words**:
-   - Add 5 words
-   - Start practice session
-   - Verify all 5 words are used
-   - Verify summary shows "X out of 5"
-
-3. **Full session flow**:
-   - Add 15+ words
-   - Complete full 10-word session
-   - Verify random selection
-   - Verify score calculation
-   - Verify restart works
-
-4. **Data persistence**:
-   - Add words
-   - Refresh browser
-   - Verify words still exist
-
-5. **Case insensitivity**:
-   - Practice with word "Apple"
-   - Type "apple"
-   - Verify marked as correct
-
-6. **Character comparison**:
-   - Practice with word "apple"
-   - Type "aple" (missing p)
-   - Verify feedback shows missing character
-   - Type "appple" (extra p)
-   - Verify feedback shows extra character
-   - Type "apqle" (wrong character)
-   - Verify feedback shows wrong character
-
-### Browser Testing
-
-Test in:
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-
-Verify TTS works in all browsers.
-
-### Validation
-
-```bash
-npm test
-npm run build
-npm run lint
-```
-
-**Success Criteria**: All edge cases handled, all tests pass, build succeeds, linter clean
-
----
-
-## Phase 11: Polish and Accessibility
-
-### Accessibility Improvements
-
-Update components with ARIA labels:
-
-#### `src/components/Practice/Practice.tsx`
-
-```typescript
-<button
-  onClick={handleReplay}
-  className={styles.replayButton}
-  aria-label="Replay word pronunciation"
->
-  🔊 Replay Word
-</button>
-
-<input
-  type="text"
-  value={userInput}
-  onChange={(e) => setUserInput(e.target.value)}
-  onKeyPress={handleKeyPress}
-  placeholder="Type the word you heard"
-  className={styles.input}
-  aria-label="Your answer"
-  autoFocus
-/>
-```
-
-#### `src/components/WordManager/WordManager.tsx`
-
-```typescript
-<input
-  type="text"
-  value={inputValue}
-  onChange={(e) => setInputValue(e.target.value)}
-  onKeyPress={handleKeyPress}
-  placeholder="Enter a word"
-  className={styles.input}
-  aria-label="New word to add"
-/>
-
-<button
-  onClick={() => handleDeleteWord(word.id!)}
-  className={styles.deleteButton}
-  aria-label={`Delete word ${word.word}`}
->
-  Delete
-</button>
-```
-
-### Responsive Design
-
-Add responsive breakpoints to CSS:
+**File**: `src/App.module.css`
 
 ```css
-@media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .input {
-    font-size: 1rem;
-  }
+.header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 1rem 2rem;
+}
+
+.header h1 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: #34495e;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.nav button:hover {
+  background-color: #4a6278;
+}
+
+.nav button.active {
+  background-color: #3498db;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem;
 }
 ```
 
-### Validation
-
+**Validation**:
 ```bash
-npm run build
-npm run lint
-```
-
-**Success Criteria**: Keyboard navigation works, screen readers work, responsive, linter clean
-
----
-
-## Phase 12: Documentation
-
-### File: `README.md`
-
-```markdown
-# Word Learning App
-
-A browser-based spelling practice application for children that uses text-to-speech to present words and provides immediate feedback on spelling accuracy.
-
-## Features
-
-- Practice spelling with text-to-speech word pronunciation
-- Character-by-character feedback showing exactly where mistakes occurred
-- Simple word database management (add/remove words)
-- 10-word practice sessions with scoring
-- All data stored locally in browser (no server required)
-
-## Browser Requirements
-
-- Chrome 90+
-- Firefox 90+
-- Safari 14+
-- Edge 90+
-
-Text-to-speech functionality requires one of these modern browsers.
-
-## Running Locally
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Open browser to http://localhost:5173
-```
-
-## Building for Production
-
-```bash
-npm run build
-npm run preview
-```
-
-## Using the App
-
-### Adding Words
-
-1. Click "Manage Words" tab
-2. Type a word in the input field
-3. Click "Add Word" or press Enter
-4. Word is immediately available for practice
-
-### Practicing
-
-1. Click "Practice" tab
-2. Listen to the word pronounced by text-to-speech
-3. Type the word you heard
-4. Press Enter or click Submit
-5. See feedback (correct/incorrect with character comparison)
-6. Automatically advances to next word
-7. After 10 words, see your score and restart
-
-## Technology Stack
-
-- React 19 with TypeScript
-- Vite (build tool)
-- IndexedDB via Dexie.js (local storage)
-- Web Speech API (text-to-speech)
-- CSS Modules (styling)
-- Vitest (testing)
-
-## Project Structure
-
-```
-src/
-├── components/       # React components
-│   ├── Practice/    # Practice session interface
-│   └── WordManager/ # Word management interface
-├── services/        # Business logic
-│   ├── database.ts  # Database operations
-│   ├── speech.ts    # Text-to-speech service
-│   └── practiceLogic.ts  # Answer comparison logic
-└── types/           # TypeScript type definitions
-```
-
-## Data Storage
-
-All data is stored locally in your browser using IndexedDB. No data is sent to any server. Words persist between sessions unless you clear your browser data.
-```
-
-### File: Update `.cj/claude/CLAUDE.md`
-
-```markdown
-- When committing, always include a verbatim copy of the starting prompt used for this conversation.
-
-# Word Learning App - Project Context
-
-## Architecture
-
-This is a single-page React application with local-only data storage. No backend server is required.
-
-### Key Components
-
-- **Practice**: Main practice session interface with TTS, input, feedback, and scoring
-- **WordManager**: CRUD interface for managing word database
-- **App**: Top-level component with tab navigation
-
-### Services Layer
-
-- **database.ts**: Dexie.js wrapper for IndexedDB operations
-- **speech.ts**: Web Speech API wrapper for text-to-speech
-- **practiceLogic.ts**: Business logic for answer comparison and scoring
-
-### Data Flow
-
-1. Words stored in IndexedDB via Dexie
-2. Practice component loads random words on session start
-3. Speech service reads words aloud
-4. User input compared with practiceLogic service
-5. Results displayed and score tracked
-6. Session completes after 10 words (or fewer if database has fewer)
-
-## Testing Strategy
-
-- Unit tests for services (database, speech, practiceLogic)
-- Component tests for UI interactions
-- Manual integration testing for full user flows
-- All tests must pass before committing
-
-## Future Extensions
-
-The architecture supports planned features:
-
-- **Word Statistics**: Add `wordStats` table in Dexie schema
-- **Word Groups**: Add `wordGroups` table with relational queries
-- **User Profiles**: Add `users` table with per-user word lists
-
-These would require Dexie schema version upgrades but no major architectural changes.
-```
-
-### Validation
-
-Review documentation for:
-- Clarity
-- Accuracy
-- No boastful language
-- User-focused (not overly technical in README)
-
----
-
-## Phase 13: Final Validation
-
-### Complete Test Suite
-
-```bash
-# Run all tests
 npm test
-
-# Verify all pass
-```
-
-### Build Verification
-
-```bash
-# Clean build
-rm -rf dist
 npm run build
-
-# Check for build errors
+npm run lint
+npm run dev  # Manual testing
 ```
 
-### Linting
+---
+
+## Phase 12: Final Validation
+
+### Complete Manual Testing
+
+1. **Empty database flow**: Clear all words, verify practice shows message
+2. **Add words**: Add 15 words via Manage Words tab
+3. **Practice session**: Complete full 10-word session
+4. **Scoring**: Verify score calculation is correct
+5. **Feedback**: Test both correct and incorrect answers
+6. **Restart**: Verify restart works
+7. **Data persistence**: Refresh browser, verify words persist
+8. **Delete words**: Remove words, verify they're gone
+
+### Run All Checks
 
 ```bash
-# Run linter
+npm test     # All tests must pass
+npm run build
 npm run lint
-
-# Should show 0 errors, 0 warnings
 ```
 
 ### Requirements Checklist
 
 - [ ] Word management (add/delete) works
 - [ ] 10-word practice sessions work
+- [ ] Words sorted alphabetically in Manage Words tab
 - [ ] TTS plays automatically and on replay
 - [ ] Answer submission via Enter key and button
 - [ ] Case-insensitive answer checking
-- [ ] Character-by-character feedback for incorrect answers
+- [ ] Feedback for correct/incorrect answers
 - [ ] Running score display during session
-- [ ] Session summary shows "N out of 10"
+- [ ] Session summary shows "N out of M"
 - [ ] Restart button works
 - [ ] Data persists in IndexedDB across sessions
-- [ ] No session history stored
 - [ ] Edge case: empty database handled
 - [ ] Edge case: fewer than 10 words handled
-- [ ] Build succeeds with no errors
 - [ ] All tests pass
+- [ ] Build succeeds with no errors
 - [ ] Linter shows no errors/warnings
-- [ ] Documentation is complete and accurate
 
-### Git Status
+---
 
-```bash
-git status
-```
+## Key TDD Principles Applied
 
-Verify:
-- README.md and CLAUDE.md are updated
-- No unintended files staged
-- No log files or secrets in repository
-
-### Final Manual Test
-
-1. Start fresh: Clear browser data
-2. Add 15 words
-3. Complete full practice session
-4. Verify score
-5. Restart session
-6. Delete some words
-7. Start new session
-8. Close and reopen browser
-9. Verify data persisted
-
-**Success Criteria**: All requirements met, all tests pass, build clean, lint clean, documentation complete
+1. **Tests First**: Every service function has tests written before implementation
+2. **Minimal Implementation**: Only code required to pass tests and meet spec
+3. **No Over-Engineering**:
+   - No speech options (rate, pitch, volume, lang) - not in spec
+   - No complex character comparison UI - simple correct/incorrect is sufficient
+   - No session history - not in spec
+4. **Code Reuse**: Shared utility functions in services layer
+5. **Validation After Each Phase**: Tests + build + lint before moving forward

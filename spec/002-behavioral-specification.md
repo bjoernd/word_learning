@@ -50,13 +50,15 @@ A browser-based spelling practice application for children. The app uses text-to
 - Automatically advance to the next word after a few seconds
 
 #### 3.5.2 Incorrect Answer
-- Show character-by-character comparison between:
-  - The correct spelling
-  - The user's answer
-- Highlight which characters are:
-  - Missing
-  - Extra
-  - Wrong
+- Show character-by-character visual comparison:
+  - Display correct word with each character in a box
+  - Display user's answer with each character in a box
+  - Use color coding to indicate:
+    - **Green** (solid border): Character matches correctly
+    - **Red** (solid border): Character is wrong
+    - **Yellow** (dashed border): Character is missing from user's answer
+    - **Red with strikethrough** (solid border): Character is extra in user's answer
+  - Characters are aligned position-by-position for easy comparison
 - Automatically advance to the next word after a few seconds
 - **No retry attempts** - user moves on after seeing the comparison
 
