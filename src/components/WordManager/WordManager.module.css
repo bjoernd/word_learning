@@ -1,0 +1,68 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.addSection {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.addButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addButton:hover {
+  background-color: #2980b9;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: #7f8c8d;
+}
+
+.wordList {
+  list-style: none;
+  padding: 0;
+}
+
+.wordItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #ecf0f1;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.wordText {
+  font-size: 1.1rem;
+}
+
+.deleteButton {
+  padding: 0.5rem 1rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background-color: #c0392b;
+}
