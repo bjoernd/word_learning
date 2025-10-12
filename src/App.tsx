@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Practice } from './components/Practice/Practice';
+import { WordManager } from './components/WordManager/WordManager';
 import styles from './App.module.css';
 
 type TabType = 'practice' | 'manage';
@@ -26,8 +28,8 @@ function App() {
         </nav>
       </header>
       <main className={styles.main}>
-        {activeTab === 'practice' && <div>Practice View</div>}
-        {activeTab === 'manage' && <div>Manage Words View</div>}
+        {activeTab === 'practice' && <Practice />}
+        {activeTab === 'manage' && <WordManager />}
       </main>
     </div>
   );
