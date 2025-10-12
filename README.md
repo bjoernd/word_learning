@@ -34,6 +34,8 @@ npm run preview
 
 The production files are in the `dist` directory and can be deployed to any web server.
 
+**Note:** Do not open `dist/index.html` directly in your browser using `file://` protocol. This will cause CORS errors and the app will not load. Always use a web server (like `npm run preview`) to serve the built files.
+
 ## How to Use
 
 ### Adding Words
