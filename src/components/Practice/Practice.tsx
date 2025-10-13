@@ -1,6 +1,6 @@
 // ABOUTME: Practice component for vocabulary learning sessions with TTS playback and feedback.
 // ABOUTME: Manages 10-word sessions, answer validation, scoring, and character-by-character comparison.
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
@@ -20,6 +20,7 @@ export function Practice() {
   const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const playWord = useCallback(async (word: string) => {
     try {
@@ -51,6 +52,12 @@ export function Practice() {
   useEffect(() => {
     startSession();
   }, [startSession]);
+
+  useEffect(() => {
+    if (sessionStarted && feedback === null && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [sessionStarted, feedback]);
 
   const handleStart = () => {
     setSessionStarted(true);
@@ -215,6 +222,7 @@ export function Practice() {
         </button>
 
         <input
+          ref={inputRef}
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
