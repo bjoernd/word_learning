@@ -172,7 +172,7 @@ export function Practice() {
     );
   }
 
-  const isSessionComplete = answers.length === sessionWords.length;
+  const isSessionComplete = answers.length === sessionWords.length && feedback === null;
 
   if (isSessionComplete) {
     const score = calculateScore(answers);
