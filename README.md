@@ -55,6 +55,15 @@ The production files are in the `dist` directory and can be deployed to any web 
 6. Continue through 10 words to complete a practice session
 7. View your score and click "Restart" to practice again
 
+### Selecting a Voice
+
+1. Click the "Voice Selector" tab
+2. Browse the list of available English voices
+3. Click a voice to select it, or use arrow keys to navigate
+4. Press Enter, Space, or double-click to hear "Hello world" in that voice
+5. Click "Set as Practice Voice" to use this voice in practice sessions
+6. Your voice selection is saved and will be used automatically
+
 ### Tips
 
 - Use the "🔊 Replay Word" button to hear the word again

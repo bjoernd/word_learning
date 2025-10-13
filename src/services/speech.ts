@@ -1,5 +1,7 @@
 // ABOUTME: Service for text-to-speech synthesis
 // ABOUTME: Wraps browser SpeechSynthesis API for speaking words aloud
+const SELECTED_VOICE_KEY = 'selectedVoiceURI';
+
 export class SpeechService {
   private synthesis: SpeechSynthesis | undefined;
   private voices: SpeechSynthesisVoice[] = [];
@@ -7,6 +9,7 @@ export class SpeechService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private currentText: string = '';
   private pendingTimeout: NodeJS.Timeout | null = null;
+  private selectedVoice: SpeechSynthesisVoice | null = null;
 
   constructor() {
     this.synthesis = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
@@ -24,6 +27,22 @@ export class SpeechService {
     if (this.synthesis) {
       this.voices = this.synthesis.getVoices();
       this.voicesLoaded = this.voices.length > 0;
+
+      if (this.voicesLoaded) {
+        this.loadSelectedVoiceFromStorage();
+      }
+    }
+  }
+
+  private loadSelectedVoiceFromStorage(): void {
+    if (typeof window === 'undefined') return;
+
+    const savedVoiceURI = localStorage.getItem(SELECTED_VOICE_KEY);
+    if (savedVoiceURI) {
+      const voice = this.voices.find(v => v.voiceURI === savedVoiceURI);
+      if (voice) {
+        this.selectedVoice = voice;
+      }
     }
   }
 
@@ -31,7 +50,7 @@ export class SpeechService {
     return typeof window !== 'undefined' && 'speechSynthesis' in window;
   }
 
-  speak(text: string): Promise<void> {
+  speak(text: string, voice?: SpeechSynthesisVoice): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.isSupported() || !this.synthesis) {
         reject(new Error('Speech synthesis not supported'));
@@ -74,8 +93,12 @@ export class SpeechService {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 0.8;
 
-        if (this.voices.length > 0) {
-          const defaultVoice = this.voices.find(voice => voice.default) || this.voices[0];
+        if (voice) {
+          utterance.voice = voice;
+        } else if (this.selectedVoice) {
+          utterance.voice = this.selectedVoice;
+        } else if (this.voices.length > 0) {
+          const defaultVoice = this.voices.find(v => v.default) || this.voices[0];
           utterance.voice = defaultVoice;
         }
 
@@ -116,6 +139,24 @@ export class SpeechService {
       this.synthesis.cancel();
       this.currentUtterance = null;
     }
+  }
+
+  getVoices(): SpeechSynthesisVoice[] {
+    if (!this.voicesLoaded) {
+      this.loadVoices();
+    }
+    return this.voices;
+  }
+
+  setSelectedVoice(voice: SpeechSynthesisVoice): void {
+    this.selectedVoice = voice;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(SELECTED_VOICE_KEY, voice.voiceURI);
+    }
+  }
+
+  getSelectedVoice(): SpeechSynthesisVoice | null {
+    return this.selectedVoice;
   }
 }
 

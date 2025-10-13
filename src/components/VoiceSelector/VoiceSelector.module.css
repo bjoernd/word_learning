@@ -1,0 +1,188 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  outline: none;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 1rem;
+}
+
+.currentVoice {
+  background-color: #f8f9fa;
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.currentVoice h3 {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+  font-weight: normal;
+}
+
+.voiceInfo {
+  margin-bottom: 1.5rem;
+}
+
+.voiceName {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.voiceDetails {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  color: #7f8c8d;
+  font-size: 1rem;
+}
+
+.badge {
+  background-color: #3498db;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.playButton {
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.playButton:hover:not(:disabled) {
+  background-color: #27ae60;
+}
+
+.playButton:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.setPracticeButton {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.setPracticeButton:hover {
+  background-color: #2980b9;
+}
+
+.practiceInfo {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #e8f4f8;
+  border-radius: 6px;
+  color: #2c3e50;
+  font-weight: 500;
+  text-align: center;
+}
+
+.voiceList {
+  margin-top: 2rem;
+}
+
+.voiceList h3 {
+  font-size: 1.3rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.voiceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #ecf0f1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.voiceItem:last-child {
+  border-bottom: none;
+}
+
+.voiceItem:hover {
+  background-color: #f8f9fa;
+}
+
+.voiceItem.selected {
+  background-color: #e3f2fd;
+  border-left: 4px solid #3498db;
+}
+
+.voiceItemName {
+  font-weight: 500;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practiceBadge {
+  background-color: #2ecc71;
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.voiceItemLang {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #7f8c8d;
+}

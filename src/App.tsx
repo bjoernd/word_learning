@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Practice } from './components/Practice/Practice';
 import { WordManager } from './components/WordManager/WordManager';
+import { VoiceSelector } from './components/VoiceSelector/VoiceSelector';
 import styles from './App.module.css';
 
-type TabType = 'practice' | 'manage';
+type TabType = 'practice' | 'manage' | 'voice';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('practice');
@@ -25,11 +26,18 @@ function App() {
           >
             Manage Words
           </button>
+          <button
+            className={activeTab === 'voice' ? styles.active : ''}
+            onClick={() => setActiveTab('voice')}
+          >
+            Voice Selector
+          </button>
         </nav>
       </header>
       <main className={styles.main}>
         {activeTab === 'practice' && <Practice />}
         {activeTab === 'manage' && <WordManager />}
+        {activeTab === 'voice' && <VoiceSelector />}
       </main>
     </div>
   );
