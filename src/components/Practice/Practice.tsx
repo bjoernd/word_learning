@@ -8,7 +8,8 @@ import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
-const FEEDBACK_DELAY_MS = 3000;
+const CORRECT_FEEDBACK_DELAY_MS = 1000;
+const INCORRECT_FEEDBACK_DELAY_MS = 3000;
 
 type FeedbackType = 'correct' | 'incorrect' | null;
 
@@ -88,6 +89,7 @@ export function Practice() {
     setAnswers(newAnswers);
     setFeedback(correct ? 'correct' : 'incorrect');
 
+    const delayMs = correct ? CORRECT_FEEDBACK_DELAY_MS : INCORRECT_FEEDBACK_DELAY_MS;
     setTimeout(() => {
       setFeedback(null);
       setUserInput('');
@@ -96,7 +98,7 @@ export function Practice() {
         setCurrentIndex(currentIndex + 1);
         playWord(sessionWords[currentIndex + 1].word);
       }
-    }, FEEDBACK_DELAY_MS);
+    }, delayMs);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
