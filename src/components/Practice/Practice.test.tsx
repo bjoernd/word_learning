@@ -77,4 +77,45 @@ describe('Practice', () => {
       expect(screen.getByText('Session Complete!')).toBeInTheDocument();
     }, { timeout: 4000 });
   }, 35000); // Long timeout for this integration test
+
+  it('should start new practice session when Enter is pressed in summary screen', async () => {
+    const user = userEvent.setup();
+    render(<Practice />);
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    // Start the session
+    const startButton = screen.getByText('Start Practice');
+    await user.click(startButton);
+
+    // Answer all 10 words correctly
+    for (let i = 0; i < 10; i++) {
+      const input = screen.getByPlaceholderText('Type the word you heard');
+      await user.clear(input);
+      await user.type(input, mockWords[i].word);
+      await user.keyboard('{Enter}');
+
+      // Wait for feedback to disappear
+      await waitFor(() => {
+        expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+      }, { timeout: 4000 });
+    }
+
+    // Wait for summary screen to appear
+    await waitFor(() => {
+      expect(screen.getByText('Session Complete!')).toBeInTheDocument();
+    });
+
+    // Press Enter key
+    await user.keyboard('{Enter}');
+
+    // Summary screen should disappear and we should be back at the start screen
+    await waitFor(() => {
+      expect(screen.queryByText('Session Complete!')).not.toBeInTheDocument();
+      expect(screen.getByText('Ready to Practice?')).toBeInTheDocument();
+    });
+  }, 35000); // Long timeout for this integration test
 });

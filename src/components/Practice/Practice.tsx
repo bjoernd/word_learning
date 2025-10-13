@@ -60,6 +60,21 @@ export function Practice() {
     }
   }, [sessionStarted, feedback]);
 
+  useEffect(() => {
+    const isSessionComplete = answers.length === sessionWords.length && feedback === null;
+
+    if (!isSessionComplete) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        startSession();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [answers.length, sessionWords.length, feedback, startSession]);
+
   const handleStart = () => {
     setSessionStarted(true);
     if (sessionWords[currentIndex]) {
