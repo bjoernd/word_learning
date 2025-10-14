@@ -104,7 +104,27 @@ addWord('<img src=x onerror=alert(1)>');
 
 **Verdict:** React's default behavior protects against XSS. ✅
 
-**Residual Risk:** If future developers add `dangerouslySetInnerHTML`, XSS becomes possible.
+**Build-Time Protection:**
+The project has ESLint configured with the `react/no-danger` rule set to `error`, which prevents `dangerouslySetInnerHTML` from being introduced:
+
+```javascript
+// eslint.config.js
+rules: {
+  'react/no-danger': 'error',  // Blocks dangerouslySetInnerHTML
+}
+```
+
+The build process runs linting before compilation:
+```json
+"build": "npm run lint && tsc -b && vite build"
+```
+
+This means any attempt to use `dangerouslySetInnerHTML` will fail the build with:
+```
+error  Dangerous property 'dangerouslySetInnerHTML' found  react/no-danger
+```
+
+**Residual Risk:** None - automated protection prevents introduction of XSS vulnerabilities. ✅
 
 ---
 
@@ -681,6 +701,35 @@ localStorage.setItem('selectedVoiceURI', 'invalid');
 ```
 
 Expected: Falls back to default voice gracefully.
+
+**4. dangerouslySetInnerHTML Protection**
+
+Create a test file with dangerous code:
+```typescript
+// src/TestDanger.tsx
+export function TestDanger() {
+  const html = '<script>alert("xss")</script>';
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+}
+```
+
+Run linting:
+```bash
+npm run lint
+```
+
+Expected output:
+```
+error  Dangerous property 'dangerouslySetInnerHTML' found  react/no-danger
+```
+
+Build will fail:
+```bash
+npm run build
+# Fails at linting step, build never completes
+```
+
+This confirms build-time protection against XSS vulnerabilities. ✅
 
 ### Automated Testing
 
