@@ -24,6 +24,38 @@ describe('Database Operations', () => {
       const word = await db.words.get(id);
       expect(word?.word).toBe('hello');
     });
+
+    it('should reject empty words', async () => {
+      await expect(addWord('')).rejects.toThrow('Word cannot be empty');
+      await expect(addWord('   ')).rejects.toThrow('Word cannot be empty');
+    });
+
+    it('should reject words longer than 100 characters', async () => {
+      const longWord = 'a'.repeat(101);
+      await expect(addWord(longWord)).rejects.toThrow('Word too long (max 100 characters)');
+    });
+
+    it('should accept words with exactly 100 characters', async () => {
+      const maxLengthWord = 'a'.repeat(100);
+      const id = await addWord(maxLengthWord);
+      expect(id).toBeGreaterThan(0);
+    });
+
+    it('should reject when word count reaches 1000', async () => {
+      // Add 1000 words
+      for (let i = 0; i < 1000; i++) {
+        await addWord(`word${i}`);
+      }
+
+      // 1001st word should be rejected
+      await expect(addWord('word1000')).rejects.toThrow('Maximum word limit reached (1,000)');
+    });
+
+    it('should trim whitespace from words', async () => {
+      const id = await addWord('  hello  ');
+      const word = await db.words.get(id);
+      expect(word?.word).toBe('hello');
+    });
   });
 
   describe('getAllWords', () => {

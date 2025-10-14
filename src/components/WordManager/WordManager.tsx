@@ -7,13 +7,23 @@ import styles from './WordManager.module.css';
 
 export function WordManager() {
   const [inputValue, setInputValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const words = useLiveQuery(() => db.words.toArray()) ?? [];
 
   const handleAddWord = async () => {
+    setErrorMessage('');
     const trimmed = inputValue.trim();
     if (trimmed) {
-      await addWord(trimmed);
-      setInputValue('');
+      try {
+        await addWord(trimmed);
+        setInputValue('');
+      } catch (error) {
+        if (error instanceof Error) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage('Failed to add word');
+        }
+      }
     }
   };
 
@@ -31,6 +41,11 @@ export function WordManager() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.header}>
+        <h2>Manage Words</h2>
+        <p className={styles.wordCount}>Words: {words.length} / 1,000</p>
+      </div>
+
       <div className={styles.addSection}>
         <input
           type="text"
@@ -45,6 +60,12 @@ export function WordManager() {
           Add Word
         </button>
       </div>
+
+      {errorMessage && (
+        <div className={styles.errorMessage}>
+          {errorMessage}
+        </div>
+      )}
 
       {words.length === 0 ? (
         <p className={styles.emptyMessage}>

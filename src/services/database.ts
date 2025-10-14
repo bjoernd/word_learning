@@ -16,8 +16,30 @@ export class WordDatabase extends Dexie {
 
 export const db = new WordDatabase();
 
+const MAX_WORD_COUNT = 1000;
+const MAX_WORD_LENGTH = 100;
+
 export async function addWord(wordText: string): Promise<number> {
-  return await db.words.add({ word: wordText });
+  // Trim whitespace
+  const trimmed = wordText.trim();
+
+  // Validate: empty string
+  if (trimmed.length === 0) {
+    throw new Error('Word cannot be empty');
+  }
+
+  // Validate: length
+  if (trimmed.length > MAX_WORD_LENGTH) {
+    throw new Error('Word too long (max 100 characters)');
+  }
+
+  // Validate: word count limit
+  const count = await db.words.count();
+  if (count >= MAX_WORD_COUNT) {
+    throw new Error('Maximum word limit reached (1,000)');
+  }
+
+  return await db.words.add({ word: trimmed });
 }
 
 export async function deleteWord(id: number): Promise<void> {
