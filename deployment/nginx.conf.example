@@ -1,0 +1,71 @@
+# Example Nginx configuration for Word Learning application
+# Copy this to your Nginx sites-available directory and modify as needed
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name yourdomain.com;  # CHANGE THIS
+
+    # SSL Configuration
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;  # CHANGE THIS
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;  # CHANGE THIS
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Application Root
+    root /var/www/word-learning/dist;  # CHANGE THIS to your deployment path
+    index index.html;
+
+    # Security Headers
+    # Note: CSP is also set in index.html via meta tag for defense in depth
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=(), usb=()" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # SPA Routing - all requests serve index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache static assets for 1 year
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+
+        # Re-add security headers for cached assets
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+    }
+
+    # Disable access to hidden files and directories
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Disable access to backup and config files
+    location ~ ~$ {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # Logging
+    access_log /var/log/nginx/word-learning-access.log;
+    error_log /var/log/nginx/word-learning-error.log;
+}
+
+# HTTP to HTTPS redirect
+server {
+    listen 80;
+    listen [::]:80;
+    server_name yourdomain.com;  # CHANGE THIS
+
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$server_name$request_uri;
+}
