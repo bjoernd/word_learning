@@ -6,9 +6,11 @@ import userEvent from '@testing-library/user-event';
 import { Practice } from './Practice';
 import * as database from '../../services/database';
 import * as speech from '../../services/speech';
+import * as soundEffects from '../../services/soundEffects';
 
 vi.mock('../../services/database');
 vi.mock('../../services/speech');
+vi.mock('../../services/soundEffects');
 
 describe('Practice', () => {
   const mockWords = [
@@ -29,6 +31,7 @@ describe('Practice', () => {
     vi.mocked(database.getWordCount).mockResolvedValue(10);
     vi.mocked(database.getRandomWords).mockResolvedValue(mockWords);
     vi.mocked(speech.speechService.speak).mockResolvedValue(undefined);
+    vi.mocked(soundEffects.soundEffectsService.play).mockResolvedValue(undefined);
   });
 
   it('should show error feedback for last word before showing summary', async () => {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
+import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
 import styles from './Practice.module.css';
 
@@ -65,6 +66,10 @@ export function Practice() {
 
     if (!isSessionComplete) return;
 
+    soundEffectsService.play('summary').catch(err => {
+      console.error('Sound effect error:', err);
+    });
+
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         startSession();
@@ -75,8 +80,13 @@ export function Practice() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [answers.length, sessionWords.length, feedback, startSession]);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setSessionStarted(true);
+    try {
+      await soundEffectsService.play('start');
+    } catch (err) {
+      console.error('Sound effect error:', err);
+    }
     if (sessionWords[currentIndex]) {
       playWord(sessionWords[currentIndex].word);
     }
@@ -103,6 +113,10 @@ export function Practice() {
     const newAnswers = [...answers, practiceWord];
     setAnswers(newAnswers);
     setFeedback(correct ? 'correct' : 'incorrect');
+
+    soundEffectsService.play(correct ? 'good' : 'bad').catch(err => {
+      console.error('Sound effect error:', err);
+    });
 
     const delayMs = correct ? CORRECT_FEEDBACK_DELAY_MS : INCORRECT_FEEDBACK_DELAY_MS;
     setTimeout(() => {
