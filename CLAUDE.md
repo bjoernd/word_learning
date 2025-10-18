@@ -48,10 +48,24 @@ npm test            # Run tests with Vitest
   - `compareAnswers()`: Character-by-character diff with 'match', 'wrong', 'missing', 'extra' states
   - `calculateScore()`: Counts correct answers
 
+- **soundEffects.ts**: Audio feedback service
+  - Preloads sound files from `/public/sounds/` (start.wav, good.wav, bad.wav, summary.wav)
+  - `play(sound)`: Plays a sound effect and returns a Promise
+  - Uses HTML5 Audio API with graceful fallback on errors
+
 ### Components (`src/components/`)
 
+- **App.tsx**: Root component with tab-based navigation
+  - Three tabs: Practice, Manage Words, Voice Selector
+  - Simple state management with useState for active tab
+
 - **Practice**: Main practice session view (10-word sessions)
+  - Uses lottie-web for visual feedback animations (confetti on correct/incorrect, celebration on completion)
+  - Animation files: `good.json`, `bad.json`, `winner-ok.json` (60-90% score), `winner-perfect.json` (90%+ score)
+  - Manages session state, user input, feedback timing, and audio/visual feedback coordination
+
 - **WordManager**: Add/delete words from database
+
 - **VoiceSelector**: Browse and select TTS voices
 
 ### Application Flow
@@ -61,7 +75,17 @@ npm test            # Run tests with Vitest
 3. Each word is spoken using `speechService.speak(word)`
 4. User types answer, submitted via Enter or button
 5. Answer compared using `compareAnswers()` for character-level feedback
-6. After 10 words, score displayed with option to restart
+6. Sound effect and animation play based on correctness
+7. After feedback delay (1s correct, 3s incorrect), next word plays automatically
+8. After 10 words, score displayed with celebration animation (if 60%+) and option to restart
+
+### Practice Session Constants
+
+- **WORDS_PER_SESSION**: 10 words per practice session
+- **CORRECT_FEEDBACK_DELAY_MS**: 1000ms before advancing after correct answer
+- **INCORRECT_FEEDBACK_DELAY_MS**: 3000ms before advancing after incorrect answer (allows time to review character comparison)
+- **MAX_WORD_COUNT**: 1000 word database limit
+- **MAX_WORD_LENGTH**: 100 character limit per word
 
 ## Key Implementation Details
 
@@ -86,7 +110,10 @@ Future versions planned to add word statistics and grouping capabilities.
 
 - Test environment: jsdom with vitest
 - Test database: fake-indexeddb for IndexedDB mocking
-- Setup file: `src/test/setup.ts`
+- Setup file: `src/test/setup.ts` mocks:
+  - `Audio` element for sound effects testing
+  - `lottie-web` for animation testing
+  - Imports `@testing-library/jest-dom` for DOM matchers
 
 ## File Header Convention
 
