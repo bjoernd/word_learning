@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { speechService } from '../../services/speech';
 import { useVoices } from '../../hooks/useVoices';
+import { handleAudioError } from '../../utils/errorHandling';
 import styles from './VoiceSelector.module.css';
 
 const TEST_PHRASE = 'Hello world';
@@ -26,7 +27,7 @@ export function VoiceSelector() {
     try {
       await speechService.speak(TEST_PHRASE, voices[voiceIndex]);
     } catch (err) {
-      console.error('Speech error:', err);
+      handleAudioError('Speech', err);
     } finally {
       setIsPlaying(false);
     }

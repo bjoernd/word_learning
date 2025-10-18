@@ -1,6 +1,7 @@
 // ABOUTME: Service for playing sound effects during practice sessions
 // ABOUTME: Manages audio playback for start, success, failure, and summary sounds
 import { isBrowser } from '../utils/browser';
+import { handleAudioError } from '../utils/errorHandling';
 
 export type SoundEffect = 'start' | 'good' | 'bad' | 'summary';
 
@@ -42,7 +43,7 @@ class SoundEffectsService {
             audio.onended = () => resolve();
           })
           .catch((error) => {
-            console.warn(`Failed to play sound effect "${sound}":`, error);
+            handleAudioError(`SoundEffects:${sound}`, error);
             resolve();
           });
       } else {

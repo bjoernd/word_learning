@@ -6,6 +6,7 @@ import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore } from '../../services/practiceLogic';
+import { handleAudioError } from '../../utils/errorHandling';
 import { ConfettiAnimation } from './ConfettiAnimation';
 import { SessionSummary } from './SessionSummary';
 import { AnswerInput } from './AnswerInput';
@@ -44,7 +45,7 @@ export function Practice() {
     try {
       await speechService.speak(word);
     } catch (err) {
-      console.error('Speech error:', err);
+      handleAudioError('Speech', err);
     }
   }, []);
 
@@ -100,7 +101,7 @@ export function Practice() {
 
     if (scorePercentage >= GOOD_SCORE_THRESHOLD) {
       soundEffectsService.play('summary').catch(err => {
-        console.error('Sound effect error:', err);
+        handleAudioError('SoundEffects', err);
       });
     }
 
@@ -149,7 +150,7 @@ export function Practice() {
     setFeedback(correct ? 'correct' : 'incorrect');
 
     soundEffectsService.play(correct ? 'good' : 'bad').catch(err => {
-      console.error('Sound effect error:', err);
+      handleAudioError('SoundEffects', err);
     });
 
     const delayMs = correct ? CORRECT_FEEDBACK_DELAY_MS : INCORRECT_FEEDBACK_DELAY_MS;
