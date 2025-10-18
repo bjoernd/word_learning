@@ -1,5 +1,7 @@
 // ABOUTME: Service for text-to-speech synthesis
 // ABOUTME: Wraps browser SpeechSynthesis API for speaking words aloud
+import { isBrowser } from '../utils/browser';
+
 const SELECTED_VOICE_KEY = 'selectedVoiceURI';
 
 export class SpeechService {
@@ -12,10 +14,10 @@ export class SpeechService {
   private selectedVoice: SpeechSynthesisVoice | null = null;
 
   constructor() {
-    this.synthesis = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+    this.synthesis = isBrowser() ? window.speechSynthesis : undefined;
     if (this.synthesis) {
       this.loadVoices();
-      if (typeof window !== 'undefined' && 'onvoiceschanged' in window.speechSynthesis) {
+      if (isBrowser() && 'onvoiceschanged' in window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = () => {
           this.loadVoices();
         };
@@ -35,7 +37,7 @@ export class SpeechService {
   }
 
   private loadSelectedVoiceFromStorage(): void {
-    if (typeof window === 'undefined') return;
+    if (!isBrowser()) return;
 
     const savedVoiceURI = localStorage.getItem(SELECTED_VOICE_KEY);
     if (savedVoiceURI) {
@@ -47,7 +49,7 @@ export class SpeechService {
   }
 
   isSupported(): boolean {
-    return typeof window !== 'undefined' && 'speechSynthesis' in window;
+    return isBrowser() && 'speechSynthesis' in window;
   }
 
   speak(text: string, voice?: SpeechSynthesisVoice): Promise<void> {
@@ -150,7 +152,7 @@ export class SpeechService {
 
   setSelectedVoice(voice: SpeechSynthesisVoice): void {
     this.selectedVoice = voice;
-    if (typeof window !== 'undefined') {
+    if (isBrowser()) {
       localStorage.setItem(SELECTED_VOICE_KEY, voice.voiceURI);
     }
   }

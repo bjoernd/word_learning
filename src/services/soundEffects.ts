@@ -1,5 +1,6 @@
 // ABOUTME: Service for playing sound effects during practice sessions
 // ABOUTME: Manages audio playback for start, success, failure, and summary sounds
+import { isBrowser } from '../utils/browser';
 
 export type SoundEffect = 'start' | 'good' | 'bad' | 'summary';
 
@@ -7,7 +8,7 @@ class SoundEffectsService {
   private audioElements: Map<SoundEffect, HTMLAudioElement> = new Map();
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (isBrowser()) {
       this.preloadSounds();
     }
   }
@@ -51,7 +52,7 @@ class SoundEffectsService {
   }
 
   isSupported(): boolean {
-    return typeof window !== 'undefined' && typeof Audio !== 'undefined';
+    return isBrowser() && typeof Audio !== 'undefined';
   }
 }
 

@@ -2,6 +2,7 @@
 // ABOUTME: Allows keyboard navigation through available voices and plays test phrase.
 import { useState, useEffect } from 'react';
 import { speechService } from '../../services/speech';
+import { isBrowser } from '../../utils/browser';
 import styles from './VoiceSelector.module.css';
 
 const TEST_PHRASE = 'Hello world';
@@ -24,12 +25,12 @@ export function VoiceSelector() {
 
     loadVoices();
 
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    if (isBrowser() && 'speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
 
     return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (isBrowser() && 'speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = null;
       }
     };
