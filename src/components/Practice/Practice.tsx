@@ -6,9 +6,9 @@ import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
-import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
+import { isAnswerCorrect, calculateScore } from '../../services/practiceLogic';
 import { handleEnterKey } from '../../utils/keyboard';
-import { getCharacterClassName } from '../../utils/characterComparison';
+import { CharacterComparison } from './CharacterComparison';
 import goodAnimation from '../../assets/animations/good.json';
 import badAnimation from '../../assets/animations/bad.json';
 import winnerOkAnimation from '../../assets/animations/winner-ok.json';
@@ -213,50 +213,6 @@ export function Practice() {
     }, delayMs);
   };
 
-  const renderCharacterComparison = (correctWord: string, userAnswer: string) => {
-    const comparison = compareAnswers(correctWord, userAnswer);
-    const correct = correctWord.toLowerCase();
-    const user = userAnswer.toLowerCase();
-
-    return (
-      <div className={styles.characterComparison}>
-        <div className={styles.comparisonRow}>
-          <span className={styles.label}>Correct:</span>
-          <div className={styles.characters}>
-            {correct.split('').map((char, idx) => (
-              <span
-                key={idx}
-                className={getCharacterClassName(comparison[idx], styles)}
-              >
-                {char}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className={styles.comparisonRow}>
-          <span className={styles.label}>Your answer:</span>
-          <div className={styles.characters}>
-            {user.split('').map((char, idx) => (
-              <span
-                key={idx}
-                className={getCharacterClassName(comparison[idx], styles)}
-              >
-                {char}
-              </span>
-            ))}
-            {comparison.slice(user.length).map((match, idx) => (
-              match === 'missing' && (
-                <span key={user.length + idx} className={getCharacterClassName('missing', styles)}>
-                  _
-                </span>
-              )
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   if (isLoading) {
     return <div className={styles.container}>Loading...</div>;
   }
@@ -368,7 +324,10 @@ export function Practice() {
               <>
                 <div className={styles.icon}>✗</div>
                 <div className={styles.message}>Incorrect</div>
-                {renderCharacterComparison(lastAnswer.word.word, lastAnswer.userAnswer)}
+                <CharacterComparison
+                  correctWord={lastAnswer.word.word}
+                  userAnswer={lastAnswer.userAnswer}
+                />
               </>
             )}
           </div>
