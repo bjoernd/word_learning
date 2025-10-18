@@ -133,9 +133,14 @@ export function Practice() {
 
     if (!isSessionComplete) return;
 
-    soundEffectsService.play('summary').catch(err => {
-      console.error('Sound effect error:', err);
-    });
+    const score = calculateScore(answers);
+    const scorePercentage = (score / sessionWords.length) * 100;
+
+    if (scorePercentage >= 60) {
+      soundEffectsService.play('summary').catch(err => {
+        console.error('Sound effect error:', err);
+      });
+    }
 
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
