@@ -29,7 +29,7 @@ type FeedbackType = 'correct' | 'incorrect' | null;
 interface ConfettiAnimationProps {
   top: number;
   left: number;
-  onComplete: () => void;
+  onComplete?: () => void;
   animationData: unknown;
 }
 
@@ -47,7 +47,9 @@ function ConfettiAnimation({ top, left, onComplete, animationData }: ConfettiAni
         animationData: animationData,
       });
 
-      animRef.current.addEventListener('complete', onComplete);
+      if (onComplete) {
+        animRef.current.addEventListener('complete', onComplete);
+      }
 
       return () => {
         animRef.current?.destroy();
@@ -294,7 +296,6 @@ export function Practice() {
             top={CENTER_POSITION}
             left={CENTER_POSITION}
             animationData={winnerOkAnimation}
-            onComplete={() => {}}
           />
         )}
         {showWinnerPerfect && (
@@ -302,7 +303,6 @@ export function Practice() {
             top={CENTER_POSITION}
             left={CENTER_POSITION}
             animationData={winnerPerfectAnimation}
-            onComplete={() => {}}
           />
         )}
       </div>

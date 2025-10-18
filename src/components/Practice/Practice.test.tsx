@@ -195,4 +195,93 @@ describe('Practice', () => {
       expect(screen.getByText(/No words available/i)).toBeInTheDocument();
     });
   });
+
+  describe('winner animations', () => {
+    it('should display winner animation for score >= 60%', async () => {
+      const user = userEvent.setup();
+      render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer 6 correct, 4 incorrect (60%)
+      for (let i = 0; i < 6; i++) {
+        const input = screen.getByPlaceholderText('Type the word you heard');
+        await user.clear(input);
+        await user.type(input, mockWords[i].word);
+        await user.keyboard('{Enter}');
+
+        await waitFor(() => {
+          expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+        }, { timeout: 4000 });
+      }
+
+      // Answer remaining incorrectly
+      for (let i = 6; i < 10; i++) {
+        const input = screen.getByPlaceholderText('Type the word you heard');
+        await user.clear(input);
+        await user.type(input, 'wrong');
+        await user.keyboard('{Enter}');
+
+        await waitFor(() => {
+          expect(screen.queryByText('Incorrect')).not.toBeInTheDocument();
+        }, { timeout: 4000 });
+      }
+
+      // Should show summary with score
+      await waitFor(() => {
+        expect(screen.getByText('Session Complete!')).toBeInTheDocument();
+        expect(screen.getByText('6')).toBeInTheDocument();
+      });
+
+      // Should play summary sound (winner animation is visual, hard to test directly)
+      expect(soundEffects.soundEffectsService.play).toHaveBeenCalledWith('summary');
+    }, 35000);
+
+    it('should display perfect winner animation for score >= 90%', async () => {
+      const user = userEvent.setup();
+      render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer 9 correct, 1 incorrect (90%)
+      for (let i = 0; i < 9; i++) {
+        const input = screen.getByPlaceholderText('Type the word you heard');
+        await user.clear(input);
+        await user.type(input, mockWords[i].word);
+        await user.keyboard('{Enter}');
+
+        await waitFor(() => {
+          expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+        }, { timeout: 4000 });
+      }
+
+      // Answer last one incorrectly
+      const input = screen.getByPlaceholderText('Type the word you heard');
+      await user.clear(input);
+      await user.type(input, 'wrong');
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.queryByText('Incorrect')).not.toBeInTheDocument();
+      }, { timeout: 4000 });
+
+      // Should show summary with score
+      await waitFor(() => {
+        expect(screen.getByText('Session Complete!')).toBeInTheDocument();
+        expect(screen.getByText('9')).toBeInTheDocument();
+      });
+
+      expect(soundEffects.soundEffectsService.play).toHaveBeenCalledWith('summary');
+    }, 35000);
+  });
 });
