@@ -1,6 +1,6 @@
 # Word Learning
 
-A web application for practicing spelling through listening exercises. The app speaks words aloud and asks you to type what you hear, providing immediate feedback on your answers.
+A web application for practicing spelling through listening exercises. The app speaks words aloud and asks you to type what you hear, providing immediate feedback with sound effects and animations.
 
 ## Installation
 
@@ -48,12 +48,13 @@ The production files are in the `dist` directory and can be deployed to any web 
 ### Practicing
 
 1. Click the "Practice" tab
-2. The app will speak a word aloud
-3. Type the word you heard
-4. Press Enter or click "Submit"
-5. Review the feedback showing whether your answer was correct
-6. Continue through 10 words to complete a practice session
-7. View your score and click "Restart" to practice again
+2. Click "Start Practice" to begin
+3. The app will speak a word aloud
+4. Type the word you heard
+5. Press Enter or click "Submit"
+6. Review the feedback with sound effects and animations
+7. Continue through 10 words to complete a practice session
+8. View your score with a celebration animation and click "Restart" to practice again
 
 ### Selecting a Voice
 
@@ -68,5 +69,7 @@ The production files are in the `dist` directory and can be deployed to any web 
 
 - Use the "🔊 Replay Word" button to hear the word again
 - Answers are not case-sensitive
-- For incorrect answers, the app shows which letters are right, wrong, or missing
+- Incorrect answers display a character-by-character comparison showing which letters are right, wrong, or missing
+- Sound effects and animations provide immediate feedback for each answer
+- Different celebration animations appear based on your final score
 - Words are stored in your browser and persist between sessions
