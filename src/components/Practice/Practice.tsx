@@ -7,7 +7,8 @@ import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
-import confettiAnimation from '../../assets/animations/good.json';
+import goodAnimation from '../../assets/animations/good.json';
+import badAnimation from '../../assets/animations/bad.json';
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
@@ -20,9 +21,10 @@ interface ConfettiAnimationProps {
   top: number;
   left: number;
   onComplete: () => void;
+  animationData: unknown;
 }
 
-function ConfettiAnimation({ top, left, onComplete }: ConfettiAnimationProps) {
+function ConfettiAnimation({ top, left, onComplete, animationData }: ConfettiAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<AnimationItem | null>(null);
 
@@ -33,7 +35,7 @@ function ConfettiAnimation({ top, left, onComplete }: ConfettiAnimationProps) {
         renderer: 'canvas',
         loop: false,
         autoplay: true,
-        animationData: confettiAnimation,
+        animationData: animationData,
       });
 
       animRef.current.addEventListener('complete', onComplete);
@@ -66,7 +68,7 @@ export function Practice() {
   const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionStarted, setSessionStarted] = useState(false);
-  const [confettiInstances, setConfettiInstances] = useState<Array<{ id: number; top: number; left: number }>>([]);
+  const [confettiInstances, setConfettiInstances] = useState<Array<{ id: number; top: number; left: number; animationData: unknown }>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const confettiNextId = useRef(0);
 
@@ -108,7 +110,7 @@ export function Practice() {
   }, [sessionStarted, feedback]);
 
   useEffect(() => {
-    if (feedback === 'correct') {
+    if (feedback === 'correct' || feedback === 'incorrect') {
       // Randomize position: 30-70% from top, 30-70% from left
       const randomTop = 30 + Math.random() * 40;
       const randomLeft = 30 + Math.random() * 40;
@@ -116,6 +118,7 @@ export function Practice() {
         id: confettiNextId.current++,
         top: randomTop,
         left: randomLeft,
+        animationData: feedback === 'correct' ? goodAnimation : badAnimation,
       };
       setConfettiInstances(prev => [...prev, newConfetti]);
     }
@@ -359,6 +362,7 @@ export function Practice() {
           key={instance.id}
           top={instance.top}
           left={instance.left}
+          animationData={instance.animationData}
           onComplete={() => {
             setConfettiInstances(prev => prev.filter(c => c.id !== instance.id));
           }}
