@@ -6,6 +6,12 @@ import styles from './App.module.css';
 
 type TabType = 'practice' | 'manage' | 'voice';
 
+const TABS = [
+  { id: 'practice' as const, label: 'Practice' },
+  { id: 'manage' as const, label: 'Manage Words' },
+  { id: 'voice' as const, label: 'Voice Selector' }
+] as const;
+
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('practice');
 
@@ -14,24 +20,15 @@ function App() {
       <header className={styles.header}>
         <h1>Word Learning</h1>
         <nav className={styles.nav}>
-          <button
-            className={activeTab === 'practice' ? styles.active : ''}
-            onClick={() => setActiveTab('practice')}
-          >
-            Practice
-          </button>
-          <button
-            className={activeTab === 'manage' ? styles.active : ''}
-            onClick={() => setActiveTab('manage')}
-          >
-            Manage Words
-          </button>
-          <button
-            className={activeTab === 'voice' ? styles.active : ''}
-            onClick={() => setActiveTab('voice')}
-          >
-            Voice Selector
-          </button>
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={activeTab === tab.id ? styles.active : ''}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </nav>
       </header>
       <main className={styles.main}>
