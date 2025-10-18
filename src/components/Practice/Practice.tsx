@@ -9,6 +9,7 @@ import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
 import goodAnimation from '../../assets/animations/good.json';
 import badAnimation from '../../assets/animations/bad.json';
+import winnerOkAnimation from '../../assets/animations/winner-ok.json';
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
@@ -274,6 +275,9 @@ export function Practice() {
 
   if (isSessionComplete) {
     const score = calculateScore(answers);
+    const scorePercentage = (score / sessionWords.length) * 100;
+    const showWinnerOk = scorePercentage >= 60 && scorePercentage < 90;
+
     return (
       <div className={styles.container}>
         <div className={styles.summary}>
@@ -287,6 +291,14 @@ export function Practice() {
             Restart
           </button>
         </div>
+        {showWinnerOk && (
+          <ConfettiAnimation
+            top={50}
+            left={50}
+            animationData={winnerOkAnimation}
+            onComplete={() => {}}
+          />
+        )}
       </div>
     );
   }
