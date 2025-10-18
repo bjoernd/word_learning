@@ -18,6 +18,11 @@ import styles from './Practice.module.css';
 const WORDS_PER_SESSION = 10;
 const CORRECT_FEEDBACK_DELAY_MS = 1000;
 const INCORRECT_FEEDBACK_DELAY_MS = 3000;
+const CONFETTI_MIN_POSITION = 30;
+const CONFETTI_POSITION_RANGE = 40;
+const CENTER_POSITION = 50;
+const GOOD_SCORE_THRESHOLD = 60;
+const PERFECT_SCORE_THRESHOLD = 90;
 
 type FeedbackType = 'correct' | 'incorrect' | null;
 
@@ -122,8 +127,8 @@ export function Practice() {
   useEffect(() => {
     if (feedback === 'correct' || feedback === 'incorrect') {
       // Randomize position: 30-70% from top, 30-70% from left
-      const randomTop = 30 + Math.random() * 40;
-      const randomLeft = 30 + Math.random() * 40;
+      const randomTop = CONFETTI_MIN_POSITION + Math.random() * CONFETTI_POSITION_RANGE;
+      const randomLeft = CONFETTI_MIN_POSITION + Math.random() * CONFETTI_POSITION_RANGE;
       const newConfetti = {
         id: confettiNextId.current++,
         top: randomTop,
@@ -140,7 +145,7 @@ export function Practice() {
     const score = calculateScore(answers);
     const scorePercentage = (score / sessionWords.length) * 100;
 
-    if (scorePercentage >= 60) {
+    if (scorePercentage >= GOOD_SCORE_THRESHOLD) {
       soundEffectsService.play('summary').catch(err => {
         console.error('Sound effect error:', err);
       });
@@ -268,8 +273,8 @@ export function Practice() {
   if (isSessionComplete) {
     const score = calculateScore(answers);
     const scorePercentage = (score / sessionWords.length) * 100;
-    const showWinnerOk = scorePercentage >= 60 && scorePercentage < 90;
-    const showWinnerPerfect = scorePercentage >= 90;
+    const showWinnerOk = scorePercentage >= GOOD_SCORE_THRESHOLD && scorePercentage < PERFECT_SCORE_THRESHOLD;
+    const showWinnerPerfect = scorePercentage >= PERFECT_SCORE_THRESHOLD;
 
     return (
       <div className={styles.container}>
@@ -286,16 +291,16 @@ export function Practice() {
         </div>
         {showWinnerOk && (
           <ConfettiAnimation
-            top={50}
-            left={50}
+            top={CENTER_POSITION}
+            left={CENTER_POSITION}
             animationData={winnerOkAnimation}
             onComplete={() => {}}
           />
         )}
         {showWinnerPerfect && (
           <ConfettiAnimation
-            top={50}
-            left={50}
+            top={CENTER_POSITION}
+            left={CENTER_POSITION}
             animationData={winnerPerfectAnimation}
             onComplete={() => {}}
           />
