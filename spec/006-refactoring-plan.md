@@ -417,11 +417,12 @@ Successfully extracted character rendering logic into dedicated component:
 
 ---
 
-## Step 9: Consolidate Voice Loading Logic
+## Step 9: Consolidate Voice Loading Logic ✅
 
+**Status**: ✅ Complete
 **Priority**: Low
 **Risk**: Medium
-**Files**: `src/services/speech.ts`, `src/components/VoiceSelector/VoiceSelector.tsx`
+**Files**: `src/hooks/useVoices.ts` (new), `src/services/speech.ts`, `src/components/VoiceSelector/VoiceSelector.tsx`
 
 ### Problem
 Similar voice loading patterns in two places with slight variations.
@@ -448,6 +449,16 @@ Similar voice loading patterns in two places with slight variations.
 - ✅ All tests pass
 - ✅ Voice selection works in both contexts
 - ✅ Code duplication reduced without added complexity
+
+### Implementation Notes
+Successfully created `useVoices` hook to consolidate voice loading logic:
+- Created `useVoices()` hook with optional filter parameter
+- Fixed critical bug: both speech.ts and VoiceSelector.tsx were setting the same global `onvoiceschanged` property, causing conflicts when VoiceSelector unmounted
+- Moved `onvoiceschanged` listener management to the hook (React-managed)
+- Removed duplicate listener from speech.ts (service still lazy-loads voices via `getVoices()`)
+- VoiceSelector simplified: uses `useVoices(voice => voice.lang.startsWith('en'))` instead of manual loading and filtering
+- Used `useRef` to avoid filter function causing re-renders while keeping latest filter available
+- All 5 hook tests pass, build and lint successful
 
 ---
 

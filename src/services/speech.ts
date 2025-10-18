@@ -17,11 +17,6 @@ export class SpeechService {
     this.synthesis = isBrowser() ? window.speechSynthesis : undefined;
     if (this.synthesis) {
       this.loadVoices();
-      if (isBrowser() && 'onvoiceschanged' in window.speechSynthesis) {
-        window.speechSynthesis.onvoiceschanged = () => {
-          this.loadVoices();
-        };
-      }
     }
   }
 

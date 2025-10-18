@@ -2,38 +2,19 @@
 // ABOUTME: Allows keyboard navigation through available voices and plays test phrase.
 import { useState, useEffect } from 'react';
 import { speechService } from '../../services/speech';
-import { isBrowser } from '../../utils/browser';
+import { useVoices } from '../../hooks/useVoices';
 import styles from './VoiceSelector.module.css';
 
 const TEST_PHRASE = 'Hello world';
 
 export function VoiceSelector() {
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const voices = useVoices((voice) => voice.lang.startsWith('en'));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [practiceVoice, setPracticeVoice] = useState<SpeechSynthesisVoice | null>(null);
 
   useEffect(() => {
-    const loadVoices = () => {
-      const availableVoices = speechService.getVoices();
-      if (availableVoices.length > 0) {
-        const englishVoices = availableVoices.filter(voice => voice.lang.startsWith('en'));
-        setVoices(englishVoices);
-        setPracticeVoice(speechService.getSelectedVoice());
-      }
-    };
-
-    loadVoices();
-
-    if (isBrowser() && 'speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    return () => {
-      if (isBrowser() && 'speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = null;
-      }
-    };
+    setPracticeVoice(speechService.getSelectedVoice());
   }, []);
 
   const playVoice = async (voiceIndex: number) => {
