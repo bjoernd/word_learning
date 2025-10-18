@@ -2,6 +2,7 @@
 // ABOUTME: Imports jest-dom matchers and configures fake-indexeddb for database tests.
 import '@testing-library/jest-dom';
 import 'fake-indexeddb/auto';
+import { vi } from 'vitest';
 
 class MockAudioElement {
   public preload = 'auto';
@@ -14,3 +15,13 @@ class MockAudioElement {
 }
 
 global.Audio = MockAudioElement as unknown as typeof Audio;
+
+vi.mock('lottie-web', () => ({
+  default: {
+    loadAnimation: () => ({
+      destroy: () => {},
+      addEventListener: () => {},
+      play: () => {},
+    }),
+  },
+}));

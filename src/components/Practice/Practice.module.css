@@ -16,6 +16,7 @@
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
+  position: relative;
 }
 
 .replayButton {
@@ -237,4 +238,18 @@
 
 .startButton:hover {
   background-color: var(--color-success-hover);
+}
+
+.confettiOverlay {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1000;
+  width: 400px;
+  height: 400px;
+}
+
+.confettiAnimation {
+  width: 100%;
+  height: 100%;
 }

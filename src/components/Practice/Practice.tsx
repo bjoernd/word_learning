@@ -1,11 +1,13 @@
 // ABOUTME: Practice component for vocabulary learning sessions with TTS playback and feedback.
 // ABOUTME: Manages 10-word sessions, answer validation, scoring, and character-by-character comparison.
 import { useState, useEffect, useCallback, useRef } from 'react';
+import lottie, { AnimationItem } from 'lottie-web';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
+import confettiAnimation from '../../assets/animations/good.json';
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
@@ -13,6 +15,48 @@ const CORRECT_FEEDBACK_DELAY_MS = 1000;
 const INCORRECT_FEEDBACK_DELAY_MS = 3000;
 
 type FeedbackType = 'correct' | 'incorrect' | null;
+
+interface ConfettiAnimationProps {
+  top: number;
+  left: number;
+  onComplete: () => void;
+}
+
+function ConfettiAnimation({ top, left, onComplete }: ConfettiAnimationProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const animRef = useRef<AnimationItem | null>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      animRef.current = lottie.loadAnimation({
+        container: containerRef.current,
+        renderer: 'canvas',
+        loop: false,
+        autoplay: true,
+        animationData: confettiAnimation,
+      });
+
+      animRef.current.addEventListener('complete', onComplete);
+
+      return () => {
+        animRef.current?.destroy();
+      };
+    }
+    // onComplete intentionally omitted from deps to prevent animation restart on re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={styles.confettiOverlay}
+      style={{
+        top: `${top}%`,
+        left: `${left}%`,
+      }}
+    />
+  );
+}
 
 export function Practice() {
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
@@ -22,7 +66,9 @@ export function Practice() {
   const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionStarted, setSessionStarted] = useState(false);
+  const [confettiInstances, setConfettiInstances] = useState<Array<{ id: number; top: number; left: number }>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const confettiNextId = useRef(0);
 
   const playWord = useCallback(async (word: string) => {
     try {
@@ -62,7 +108,23 @@ export function Practice() {
   }, [sessionStarted, feedback]);
 
   useEffect(() => {
-    const isSessionComplete = answers.length === sessionWords.length && feedback === null;
+    if (feedback === 'correct') {
+      // Randomize position: 30-70% from top, 30-70% from left
+      const randomTop = 30 + Math.random() * 40;
+      const randomLeft = 30 + Math.random() * 40;
+      const newConfetti = {
+        id: confettiNextId.current++,
+        top: randomTop,
+        left: randomLeft,
+      };
+      setConfettiInstances(prev => [...prev, newConfetti]);
+    }
+  }, [feedback]);
+
+  useEffect(() => {
+    const isSessionComplete = answers.length === sessionWords.length &&
+                               sessionWords.length > 0 &&
+                               feedback === null;
 
     if (!isSessionComplete) return;
 
@@ -203,7 +265,9 @@ export function Practice() {
     );
   }
 
-  const isSessionComplete = answers.length === sessionWords.length && feedback === null;
+  const isSessionComplete = answers.length === sessionWords.length &&
+                            sessionWords.length > 0 &&
+                            feedback === null;
 
   if (isSessionComplete) {
     const score = calculateScore(answers);
@@ -289,6 +353,17 @@ export function Practice() {
           </div>
         )}
       </div>
+
+      {confettiInstances.map(instance => (
+        <ConfettiAnimation
+          key={instance.id}
+          top={instance.top}
+          left={instance.left}
+          onComplete={() => {
+            setConfettiInstances(prev => prev.filter(c => c.id !== instance.id));
+          }}
+        />
+      ))}
     </div>
   );
 }
