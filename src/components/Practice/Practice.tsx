@@ -1,18 +1,16 @@
 // ABOUTME: Practice component for vocabulary learning sessions with TTS playback and feedback.
 // ABOUTME: Manages 10-word sessions, answer validation, scoring, and character-by-character comparison.
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import lottie, { AnimationItem } from 'lottie-web';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore } from '../../services/practiceLogic';
-import { handleEnterKey } from '../../utils/keyboard';
-import { CharacterComparison } from './CharacterComparison';
+import { ConfettiAnimation } from './ConfettiAnimation';
+import { SessionSummary } from './SessionSummary';
+import { AnswerInput } from './AnswerInput';
 import goodAnimation from '../../assets/animations/good.json';
 import badAnimation from '../../assets/animations/bad.json';
-import winnerOkAnimation from '../../assets/animations/winner-ok.json';
-import winnerPerfectAnimation from '../../assets/animations/winner-perferct.json';
 import styles from './Practice.module.css';
 
 const WORDS_PER_SESSION = 10;
@@ -20,56 +18,9 @@ const CORRECT_FEEDBACK_DELAY_MS = 1000;
 const INCORRECT_FEEDBACK_DELAY_MS = 3000;
 const CONFETTI_MIN_POSITION = 30;
 const CONFETTI_POSITION_RANGE = 40;
-const CENTER_POSITION = 50;
 const GOOD_SCORE_THRESHOLD = 60;
-const PERFECT_SCORE_THRESHOLD = 90;
 
 type FeedbackType = 'correct' | 'incorrect' | null;
-
-interface ConfettiAnimationProps {
-  top: number;
-  left: number;
-  onComplete?: () => void;
-  animationData: unknown;
-}
-
-function ConfettiAnimation({ top, left, onComplete, animationData }: ConfettiAnimationProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animRef = useRef<AnimationItem | null>(null);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      animRef.current = lottie.loadAnimation({
-        container: containerRef.current,
-        renderer: 'canvas',
-        loop: false,
-        autoplay: true,
-        animationData: animationData,
-      });
-
-      if (onComplete) {
-        animRef.current.addEventListener('complete', onComplete);
-      }
-
-      return () => {
-        animRef.current?.destroy();
-      };
-    }
-    // onComplete intentionally omitted from deps to prevent animation restart on re-renders
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <div
-      ref={containerRef}
-      className={styles.confettiOverlay}
-      style={{
-        top: `${top}%`,
-        left: `${left}%`,
-      }}
-    />
-  );
-}
 
 export function Practice() {
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
@@ -230,39 +181,7 @@ export function Practice() {
 
   if (isSessionComplete) {
     const score = calculateScore(answers);
-    const scorePercentage = (score / sessionWords.length) * 100;
-    const showWinnerOk = scorePercentage >= GOOD_SCORE_THRESHOLD && scorePercentage < PERFECT_SCORE_THRESHOLD;
-    const showWinnerPerfect = scorePercentage >= PERFECT_SCORE_THRESHOLD;
-
-    return (
-      <div className={styles.container}>
-        <div className={styles.summary}>
-          <h2>Session Complete!</h2>
-          <div className={styles.score}>
-            <span className={styles.scoreNumber}>{score}</span>
-            <span> out of </span>
-            <span className={styles.scoreNumber}>{sessionWords.length}</span>
-          </div>
-          <button onClick={startSession} className={styles.restartButton}>
-            Restart
-          </button>
-        </div>
-        {showWinnerOk && (
-          <ConfettiAnimation
-            top={CENTER_POSITION}
-            left={CENTER_POSITION}
-            animationData={winnerOkAnimation}
-          />
-        )}
-        {showWinnerPerfect && (
-          <ConfettiAnimation
-            top={CENTER_POSITION}
-            left={CENTER_POSITION}
-            animationData={winnerPerfectAnimation}
-          />
-        )}
-      </div>
-    );
+    return <SessionSummary score={score} total={sessionWords.length} onRestart={startSession} />;
   }
 
   const score = calculateScore(answers);
@@ -284,55 +203,18 @@ export function Practice() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.scoreDisplay}>
-        Score: {score}/{answers.length}
-      </div>
-
-      <div className={styles.practiceArea}>
-        <button onClick={handleReplay} className={styles.replayButton}>
-          🔊 Replay Word
-        </button>
-
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onKeyPress={(e) => handleEnterKey(e, handleSubmit)}
-          placeholder="Type the word you heard"
-          className={styles.input}
-          disabled={feedback !== null}
-          autoFocus
-        />
-
-        <button
-          onClick={handleSubmit}
-          className={styles.submitButton}
-          disabled={feedback !== null}
-        >
-          Submit
-        </button>
-
-        {feedback && (
-          <div className={feedback === 'correct' ? styles.correct : styles.incorrect}>
-            {feedback === 'correct' ? (
-              <>
-                <div className={styles.icon}>✓</div>
-                <div className={styles.message}>Correct!</div>
-              </>
-            ) : (
-              <>
-                <div className={styles.icon}>✗</div>
-                <div className={styles.message}>Incorrect</div>
-                <CharacterComparison
-                  correctWord={lastAnswer.word.word}
-                  userAnswer={lastAnswer.userAnswer}
-                />
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      <AnswerInput
+        userInput={userInput}
+        onInputChange={setUserInput}
+        onSubmit={handleSubmit}
+        onReplay={handleReplay}
+        feedback={feedback}
+        score={score}
+        answersCount={answers.length}
+        correctWord={lastAnswer?.word.word}
+        userAnswer={lastAnswer?.userAnswer}
+        inputRef={inputRef}
+      />
 
       {confettiInstances.map(instance => (
         <ConfettiAnimation
