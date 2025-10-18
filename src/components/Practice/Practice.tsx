@@ -7,6 +7,7 @@ import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
+import { handleEnterKey } from '../../utils/keyboard';
 import goodAnimation from '../../assets/animations/good.json';
 import badAnimation from '../../assets/animations/bad.json';
 import winnerOkAnimation from '../../assets/animations/winner-ok.json';
@@ -202,12 +203,6 @@ export function Practice() {
     }, delayMs);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSubmit();
-    }
-  };
-
   const renderCharacterComparison = (correctWord: string, userAnswer: string) => {
     const comparison = compareAnswers(correctWord, userAnswer);
     const correct = correctWord.toLowerCase();
@@ -351,7 +346,7 @@ export function Practice() {
           type="text"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyPress={(e) => handleEnterKey(e, handleSubmit)}
           placeholder="Type the word you heard"
           className={styles.input}
           disabled={feedback !== null}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addWord, deleteWord } from '../../services/database';
+import { handleEnterKey } from '../../utils/keyboard';
 import styles from './WordManager.module.css';
 
 export function WordManager() {
@@ -33,12 +34,6 @@ export function WordManager() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleAddWord();
-    }
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -51,7 +46,7 @@ export function WordManager() {
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyPress={(e) => handleEnterKey(e, handleAddWord)}
           placeholder="Enter a word"
           className={styles.input}
           aria-label="New word to add"
