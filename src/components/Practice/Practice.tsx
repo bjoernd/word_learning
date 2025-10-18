@@ -8,6 +8,7 @@ import { speechService } from '../../services/speech';
 import { soundEffectsService } from '../../services/soundEffects';
 import { isAnswerCorrect, calculateScore, compareAnswers } from '../../services/practiceLogic';
 import { handleEnterKey } from '../../utils/keyboard';
+import { getCharacterClassName } from '../../utils/characterComparison';
 import goodAnimation from '../../assets/animations/good.json';
 import badAnimation from '../../assets/animations/bad.json';
 import winnerOkAnimation from '../../assets/animations/winner-ok.json';
@@ -218,11 +219,7 @@ export function Practice() {
             {correct.split('').map((char, idx) => (
               <span
                 key={idx}
-                className={`${styles.char} ${
-                  comparison[idx] === 'match' ? styles.charMatch :
-                  comparison[idx] === 'missing' ? styles.charMissing :
-                  styles.charWrong
-                }`}
+                className={getCharacterClassName(comparison[idx], styles)}
               >
                 {char}
               </span>
@@ -235,18 +232,14 @@ export function Practice() {
             {user.split('').map((char, idx) => (
               <span
                 key={idx}
-                className={`${styles.char} ${
-                  comparison[idx] === 'match' ? styles.charMatch :
-                  comparison[idx] === 'extra' ? styles.charExtra :
-                  styles.charWrong
-                }`}
+                className={getCharacterClassName(comparison[idx], styles)}
               >
                 {char}
               </span>
             ))}
             {comparison.slice(user.length).map((match, idx) => (
               match === 'missing' && (
-                <span key={user.length + idx} className={`${styles.char} ${styles.charMissing}`}>
+                <span key={user.length + idx} className={getCharacterClassName('missing', styles)}>
                   _
                 </span>
               )
