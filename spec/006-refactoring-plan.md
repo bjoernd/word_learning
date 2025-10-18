@@ -849,8 +849,9 @@ User feedback confirmed the double-click feature is actively used and valuable. 
 
 ---
 
-## Step 16: Reduce State Tracking in SpeechService
+## Step 16: Reduce State Tracking in SpeechService ✅
 
+**Status**: ✅ Complete
 **Priority**: Low
 **Risk**: High
 **Files**: `src/services/speech.ts`
@@ -897,6 +898,39 @@ This may be more than necessary and adds complexity to state management.
 - ✅ Speech synthesis works reliably
 - ✅ State management simpler and clearer
 - ✅ No regressions on any platform
+
+### Implementation Notes
+**Decision: KEEP the three-state approach - no simplification needed.**
+
+Analysis revealed the three states track three distinct phases of the speech lifecycle:
+
+**Timeline of a speak() call:**
+1. `speak("hello")` called
+2. `currentText = "hello"` (set immediately for deduplication)
+3. `pendingTimeout = setTimeout(...)` (macOS Safari workaround delay: 0-200ms)
+4. [delay period]
+5. Timeout fires:
+   - `currentUtterance = new Utterance("hello")`
+   - `pendingTimeout = null`
+   - `synthesis.speak(utterance)`
+6. Speech completes:
+   - `currentUtterance = null`
+   - `currentText = ""`
+
+**Why three states are necessary:**
+1. **currentText**: Set immediately when speak() is called, used for deduplication (line 61)
+2. **pendingTimeout**: Delay timer (0-200ms) before speaking, part of macOS Safari workaround
+3. **currentUtterance**: Set when timeout fires, prevents stale callbacks from affecting state
+
+**Why combining would add complexity:**
+- States exist at different times (currentText set before pendingTimeout, currentUtterance set after)
+- More null checks needed throughout code
+- Deduplication logic would be harder to read
+- Would obscure the three distinct phases of speech lifecycle
+
+**Changes made:**
+- Added explanatory comments documenting the three-phase lifecycle
+- All 119 tests pass, linting clean
 
 ---
 

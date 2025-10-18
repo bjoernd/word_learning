@@ -8,9 +8,16 @@ export class SpeechService {
   private synthesis: SpeechSynthesis | undefined;
   private voices: SpeechSynthesisVoice[] = [];
   private voicesLoaded = false;
+
+  // Three-phase state tracking for speech lifecycle:
+  // 1. currentText: What we're trying to speak (set immediately, used for deduplication)
+  // 2. pendingTimeout: Delay timer before speaking (macOS Safari workaround, 0-200ms)
+  // 3. currentUtterance: What's actually speaking (set when timeout fires, prevents stale callbacks)
+  // These exist at different times and cannot be combined without adding complexity.
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private currentText: string = '';
   private pendingTimeout: NodeJS.Timeout | null = null;
+
   private selectedVoice: SpeechSynthesisVoice | null = null;
 
   constructor() {
