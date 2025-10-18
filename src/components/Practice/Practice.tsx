@@ -1,6 +1,6 @@
 // ABOUTME: Practice component for vocabulary learning sessions with TTS playback and feedback.
 // ABOUTME: Manages 10-word sessions, answer validation, scoring, and character-by-character comparison.
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import lottie, { AnimationItem } from 'lottie-web';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
@@ -75,6 +75,12 @@ export function Practice() {
   const inputRef = useRef<HTMLInputElement>(null);
   const confettiNextId = useRef(0);
 
+  const isSessionComplete = useMemo(() => {
+    return answers.length === sessionWords.length &&
+           sessionWords.length > 0 &&
+           feedback === null;
+  }, [answers.length, sessionWords.length, feedback]);
+
   const playWord = useCallback(async (word: string) => {
     try {
       await speechService.speak(word);
@@ -128,10 +134,6 @@ export function Practice() {
   }, [feedback]);
 
   useEffect(() => {
-    const isSessionComplete = answers.length === sessionWords.length &&
-                               sessionWords.length > 0 &&
-                               feedback === null;
-
     if (!isSessionComplete) return;
 
     const score = calculateScore(answers);
@@ -151,7 +153,7 @@ export function Practice() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [answers.length, sessionWords.length, feedback, startSession]);
+  }, [isSessionComplete, answers, sessionWords.length, startSession]);
 
   const handleStart = async () => {
     setSessionStarted(true);
@@ -269,10 +271,6 @@ export function Practice() {
       </div>
     );
   }
-
-  const isSessionComplete = answers.length === sessionWords.length &&
-                            sessionWords.length > 0 &&
-                            feedback === null;
 
   if (isSessionComplete) {
     const score = calculateScore(answers);

@@ -121,4 +121,78 @@ describe('Practice', () => {
       expect(screen.getByText('Ready to Practice?')).toBeInTheDocument();
     });
   }, 35000); // Long timeout for this integration test
+
+  describe('session completion logic', () => {
+    it('should show summary when all words answered and no feedback showing', async () => {
+      const user = userEvent.setup();
+      render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer all 10 words
+      for (let i = 0; i < 10; i++) {
+        const input = screen.getByPlaceholderText('Type the word you heard');
+        await user.clear(input);
+        await user.type(input, mockWords[i].word);
+        await user.keyboard('{Enter}');
+
+        await waitFor(() => {
+          expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+        }, { timeout: 4000 });
+      }
+
+      // Session should be complete - summary should show
+      await waitFor(() => {
+        expect(screen.getByText('Session Complete!')).toBeInTheDocument();
+      });
+    }, 35000);
+
+    it('should not show summary when session incomplete', async () => {
+      const user = userEvent.setup();
+      render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer only 5 words
+      for (let i = 0; i < 5; i++) {
+        const input = screen.getByPlaceholderText('Type the word you heard');
+        await user.clear(input);
+        await user.type(input, mockWords[i].word);
+        await user.keyboard('{Enter}');
+
+        await waitFor(() => {
+          expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+        }, { timeout: 4000 });
+      }
+
+      // Session should NOT be complete - no summary
+      expect(screen.queryByText('Session Complete!')).not.toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Type the word you heard')).toBeInTheDocument();
+    }, 20000);
+
+    it('should not show summary when no words loaded', async () => {
+      vi.mocked(database.getRandomWords).mockResolvedValue([]);
+      vi.mocked(database.getWordCount).mockResolvedValue(0);
+
+      render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      // Should show "not enough words" message instead of summary
+      expect(screen.queryByText('Session Complete!')).not.toBeInTheDocument();
+      expect(screen.getByText(/No words available/i)).toBeInTheDocument();
+    });
+  });
 });
