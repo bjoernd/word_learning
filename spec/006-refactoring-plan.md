@@ -796,8 +796,9 @@ All 119 tests pass, linting clean.
 
 ---
 
-## Step 15: Remove or Justify Double-Click Handler
+## Step 15: Remove or Justify Double-Click Handler ✅
 
+**Status**: ✅ Complete
 **Priority**: Low
 **Risk**: Low
 **Files**: `src/components/VoiceSelector/VoiceSelector.tsx`
@@ -836,6 +837,15 @@ Voice list items have `onDoubleClick` handler (line 134) that duplicates Play bu
 - ✅ Voice selection behavior clear and intuitive
 - ✅ No unexpected interaction conflicts
 - ✅ Feature documented if kept, removed if not valuable
+
+### Implementation Notes
+**Decision: KEEP the double-click handler and document it.**
+
+User feedback confirmed the double-click feature is actively used and valuable. Chose Option B:
+- Updated help text to document the feature: "Use arrow keys to navigate, Enter or Space to play, or double-click a voice"
+- Feature is now discoverable for new users
+- No tests needed as existing behavior unchanged
+- All 119 tests pass, linting clean
 
 ---
 

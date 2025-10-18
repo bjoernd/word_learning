@@ -71,7 +71,7 @@ export function VoiceSelector() {
     <div className={styles.container} onKeyDown={handleKeyDown} tabIndex={0}>
       <div className={styles.header}>
         <h2>Voice Selector</h2>
-        <p>Use arrow keys to navigate, Enter or Space to play</p>
+        <p>Use arrow keys to navigate, Enter or Space to play, or double-click a voice</p>
       </div>
 
       <div className={styles.currentVoice}>
