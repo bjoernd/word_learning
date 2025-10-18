@@ -462,8 +462,9 @@ Successfully created `useVoices` hook to consolidate voice loading logic:
 
 ---
 
-## Step 10: Simplify Speech Cancellation Logic
+## Step 10: Simplify Speech Cancellation Logic ✅
 
+**Status**: ✅ Complete
 **Priority**: Low
 **Risk**: High
 **Files**: `src/services/speech.ts`
@@ -495,6 +496,26 @@ Complex cancellation logic (lines 74-88) may be over-defensive.
 - ✅ All tests pass including edge cases
 - ✅ Works on all target browsers
 - ✅ Documented rationale for any remaining complexity
+
+### Implementation Notes
+**Decision: Complexity is justified, no simplification needed.**
+
+Investigation revealed the complex cancellation logic was added in commit 881be6f to fix specific macOS Safari bugs:
+1. macOS speechSynthesis gets stuck in "speaking" state
+2. Browser's cancel() is async, affecting new utterances
+3. The cancel-pause-resume-cancel sequence is a proven workaround
+
+Evidence supporting current implementation:
+- Tests already cover the edge cases (speech.test.ts lines 63-99)
+- Commit message documents the root cause and fix
+- 200ms delay after cancel is platform-specific requirement
+
+Changes made:
+- Added code comments explaining the macOS Safari workaround
+- Added reference to commit 881be6f for future maintainers
+- Documented the 200ms delay requirement
+
+No simplification performed as it would break macOS Safari support.
 
 ---
 

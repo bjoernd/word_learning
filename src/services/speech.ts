@@ -68,6 +68,9 @@ export class SpeechService {
         this.pendingTimeout = null;
       }
 
+      // macOS Safari workaround: The browser can get stuck in "speaking" state.
+      // The cancel-pause-resume-cancel sequence reliably clears this state.
+      // See commit 881be6f for details on the bug this fixes.
       if (this.synthesis.speaking) {
         this.synthesis.cancel();
         this.synthesis.pause();
@@ -126,6 +129,7 @@ export class SpeechService {
         this.synthesis!.speak(utterance);
       };
 
+      // macOS Safari requires 200ms delay after cancel() to ensure queue clears
       const delay = needsCancel ? 200 : 0;
       this.pendingTimeout = setTimeout(speakUtterance, delay) as unknown as NodeJS.Timeout;
     });
