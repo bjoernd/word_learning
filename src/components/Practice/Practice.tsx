@@ -31,9 +31,14 @@ export function Practice() {
   const [feedback, setFeedback] = useState<FeedbackType>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionStarted, setSessionStarted] = useState(false);
-  const [confettiInstances, setConfettiInstances] = useState<Array<{ id: number; top: number; left: number; animationData: unknown }>>([]);
+  const [confettiAnimation, setConfettiAnimation] = useState<{
+    top: number;
+    left: number;
+    animationData: unknown;
+    key: number;
+  } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const confettiNextId = useRef(0);
+  const confettiKey = useRef(0);
 
   const isSessionComplete = useMemo(() => {
     return answers.length === sessionWords.length &&
@@ -83,13 +88,12 @@ export function Practice() {
       // Randomize position: 30-70% from top, 30-70% from left
       const randomTop = CONFETTI_MIN_POSITION + Math.random() * CONFETTI_POSITION_RANGE;
       const randomLeft = CONFETTI_MIN_POSITION + Math.random() * CONFETTI_POSITION_RANGE;
-      const newConfetti = {
-        id: confettiNextId.current++,
+      setConfettiAnimation({
         top: randomTop,
         left: randomLeft,
         animationData: feedback === 'correct' ? goodAnimation : badAnimation,
-      };
-      setConfettiInstances(prev => [...prev, newConfetti]);
+        key: confettiKey.current++,
+      });
     }
   }, [feedback]);
 
@@ -217,17 +221,15 @@ export function Practice() {
         inputRef={inputRef}
       />
 
-      {confettiInstances.map(instance => (
+      {confettiAnimation && (
         <ConfettiAnimation
-          key={instance.id}
-          top={instance.top}
-          left={instance.left}
-          animationData={instance.animationData}
-          onComplete={() => {
-            setConfettiInstances(prev => prev.filter(c => c.id !== instance.id));
-          }}
+          key={confettiAnimation.key}
+          top={confettiAnimation.top}
+          left={confettiAnimation.left}
+          animationData={confettiAnimation.animationData}
+          onComplete={() => setConfettiAnimation(null)}
         />
-      ))}
+      )}
     </div>
   );
 }

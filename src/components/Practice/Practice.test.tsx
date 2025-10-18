@@ -284,4 +284,91 @@ describe('Practice', () => {
       expect(soundEffects.soundEffectsService.play).toHaveBeenCalledWith('summary');
     }, 35000);
   });
+
+  describe('confetti animations', () => {
+    it('should display confetti animation on correct answer', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer first word correctly
+      const input = screen.getByPlaceholderText('Type the word you heard');
+      await user.type(input, mockWords[0].word);
+      await user.keyboard('{Enter}');
+
+      // Confetti should appear
+      await waitFor(() => {
+        const confettiElements = container.querySelectorAll('[class*="confettiOverlay"]');
+        expect(confettiElements.length).toBe(1);
+      });
+    }, 10000);
+
+    it('should display confetti animation on incorrect answer', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer first word incorrectly
+      const input = screen.getByPlaceholderText('Type the word you heard');
+      await user.type(input, 'wronganswer');
+      await user.keyboard('{Enter}');
+
+      // Confetti should appear
+      await waitFor(() => {
+        const confettiElements = container.querySelectorAll('[class*="confettiOverlay"]');
+        expect(confettiElements.length).toBe(1);
+      });
+    }, 10000);
+
+    it('should replace confetti animation when new answer submitted', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<Practice />);
+
+      await waitFor(() => {
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      });
+
+      const startButton = screen.getByText('Start Practice');
+      await user.click(startButton);
+
+      // Answer first word
+      const input = screen.getByPlaceholderText('Type the word you heard');
+      await user.type(input, mockWords[0].word);
+      await user.keyboard('{Enter}');
+
+      // Confetti should appear
+      await waitFor(() => {
+        const confettiElements = container.querySelectorAll('[class*="confettiOverlay"]');
+        expect(confettiElements.length).toBe(1);
+      });
+
+      // Wait for feedback to clear and next word
+      await waitFor(() => {
+        expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
+      }, { timeout: 4000 });
+
+      // Answer second word
+      await user.clear(input);
+      await user.type(input, mockWords[1].word);
+      await user.keyboard('{Enter}');
+
+      // Should still have only one confetti (new one replaces old)
+      await waitFor(() => {
+        const confettiElements = container.querySelectorAll('[class*="confettiOverlay"]');
+        expect(confettiElements.length).toBe(1);
+      });
+    }, 10000);
+  });
 });

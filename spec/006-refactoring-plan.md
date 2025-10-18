@@ -710,8 +710,9 @@ Successfully standardized error handling across the application:
 
 ---
 
-## Step 14: Simplify Confetti Instance Management
+## Step 14: Simplify Confetti Instance Management ✅
 
+**Status**: ✅ Complete
 **Priority**: Low
 **Risk**: Medium
 **Files**: `src/components/Practice/Practice.tsx`
@@ -771,6 +772,27 @@ Complex confetti instance management system:
 - ✅ Confetti animations work as expected
 - ✅ Code simpler and easier to understand
 - ✅ No performance issues with approach
+
+### Implementation Notes
+Successfully simplified confetti management from array-based to single-animation approach:
+- **Replaced** array state (`confettiInstances`) with single object state (`confettiAnimation`)
+- **Removed** manual ID generation (`confettiNextId`)
+- **Added** key-based re-rendering using `confettiKey.current++` to force new animation on same feedback type
+- **Removed** array filtering logic - now simple `setConfettiAnimation(null)` on completion
+- **Result**: Reduced state complexity from ~26 lines to ~8 lines of management code
+
+**Rationale for single-animation approach:**
+1. User timing analysis shows confetti overlap is rare (feedback delays 1-3s, most users take 3+ seconds to answer)
+2. Multiple overlapping confetti provides no UX benefit and can be visually noisy
+3. Single animation is simpler, cleaner, and easier to maintain
+4. New confetti simply replaces old confetti if overlap occurs (which is fine UX-wise)
+
+**Tests added:**
+- Confetti appears on correct answer (Practice.test.tsx:289-310)
+- Confetti appears on incorrect answer (Practice.test.tsx:312-333)
+- New confetti replaces old confetti (Practice.test.tsx:335-372)
+
+All 119 tests pass, linting clean.
 
 ---
 
