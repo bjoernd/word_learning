@@ -1,8 +1,25 @@
 // ABOUTME: Test setup file for vitest configuration.
-// ABOUTME: Imports jest-dom matchers and configures fake-indexeddb for database tests.
+// ABOUTME: Imports jest-dom matchers, configures fake-indexeddb for database tests, and initializes i18n.
 import '@testing-library/jest-dom';
 import 'fake-indexeddb/auto';
 import { vi } from 'vitest';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import translationEN from '../i18n/locales/en/translation.json';
+
+// Initialize i18n for tests
+i18n
+  .use(initReactI18next)
+  .init({
+    lng: 'en',
+    fallbackLng: 'en',
+    resources: {
+      en: { translation: translationEN }
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+  });
 
 class MockAudioElement {
   public preload = 'auto';

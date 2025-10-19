@@ -267,7 +267,7 @@ Convert each component to use `useTranslation` hook and translation keys:
    - Empty state messages
    - Start screen text
 
-10. **AnswerInput.tsx**
+10. **AnswerInput.tsx** ✅
     - Score display (with interpolation)
     - Button labels
     - Placeholder text

@@ -1,6 +1,7 @@
 // ABOUTME: Component for user input and feedback during practice sessions.
 // ABOUTME: Handles text input, submission, replay, and displays correct/incorrect feedback with character comparison.
 import { Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import { handleEnterKey } from '../../utils/keyboard';
 import { CharacterComparison } from './CharacterComparison';
 import styles from './Practice.module.css';
@@ -32,15 +33,17 @@ export function AnswerInput({
   userAnswer,
   inputRef,
 }: AnswerInputProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className={styles.scoreDisplay}>
-        Score: {score}/{answersCount}
+        {t('practice.answer.score', { score, total: answersCount })}
       </div>
 
       <div className={styles.practiceArea}>
         <button onClick={onReplay} className={styles.replayButton}>
-          🔊 Replay Word
+          {t('practice.answer.replayButton')}
         </button>
 
         <input
@@ -49,7 +52,7 @@ export function AnswerInput({
           value={userInput}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyPress={(e) => handleEnterKey(e, onSubmit)}
-          placeholder="Type the word you heard"
+          placeholder={t('practice.answer.placeholder')}
           className={styles.input}
           disabled={feedback !== null}
           autoFocus
@@ -60,20 +63,20 @@ export function AnswerInput({
           className={styles.submitButton}
           disabled={feedback !== null}
         >
-          Submit
+          {t('practice.answer.submitButton')}
         </button>
 
         {feedback && (
           <div className={feedback === 'correct' ? styles.correct : styles.incorrect}>
             {feedback === 'correct' ? (
               <>
-                <div className={styles.icon}>✓</div>
-                <div className={styles.message}>Correct!</div>
+                <div className={styles.icon}>{t('practice.answer.correctIcon')}</div>
+                <div className={styles.message}>{t('practice.answer.correct')}</div>
               </>
             ) : (
               <>
-                <div className={styles.icon}>✗</div>
-                <div className={styles.message}>Incorrect</div>
+                <div className={styles.icon}>{t('practice.answer.incorrectIcon')}</div>
+                <div className={styles.message}>{t('practice.answer.incorrect')}</div>
                 {correctWord && userAnswer && (
                   <CharacterComparison
                     correctWord={correctWord}
