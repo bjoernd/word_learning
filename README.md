@@ -38,6 +38,12 @@ The production files are in the `dist` directory and can be deployed to any web 
 
 ## How to Use
 
+### Language Selection
+
+The app interface is available in English and German. Use the language switcher (EN/DE) in the top-right corner to change the UI language. Your language preference is saved and will be remembered on your next visit.
+
+**Note:** The interface language is separate from the practice words - currently, practice words are English only with English text-to-speech voices.
+
 ### Adding Words
 
 1. Click the "Manage Words" tab

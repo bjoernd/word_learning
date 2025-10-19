@@ -505,16 +505,16 @@ i18n
 
 Implementation is complete when:
 
-- [ ] All 47 user-visible strings use translation keys
-- [ ] Language switcher is functional and accessible
-- [ ] Language preference persists across sessions
-- [ ] English translations are complete and correct
-- [ ] German translation file structure is ready for Bjoern's translations
-- [ ] No hardcoded user-visible strings remain in components
-- [ ] All tests pass in both languages
-- [ ] No layout issues with longer German text
-- [ ] TypeScript types provide autocomplete for translation keys
-- [ ] Documentation (CLAUDE.md, README.md) updated
+- [x] All 47 user-visible strings use translation keys
+- [x] Language switcher is functional and accessible
+- [x] Language preference persists across sessions
+- [x] English translations are complete and correct
+- [x] German translations complete and integrated
+- [x] No hardcoded user-visible strings remain in components
+- [x] All tests pass in both languages (131 tests passing)
+- [x] No layout issues with longer German text
+- [x] TypeScript types provide autocomplete for translation keys
+- [x] Documentation (CLAUDE.md, README.md) updated
 
 ## Decisions Made
 
