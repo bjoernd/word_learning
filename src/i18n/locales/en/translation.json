@@ -49,12 +49,15 @@
     "button": {
       "add": "Add Word",
       "delete": "Delete",
-      "deleteAriaLabel": "Delete word {{word}}"
+      "deleteAriaLabel": "Delete word {{word}}",
+      "deleteSelected": "Delete Selected ({{count}})",
+      "deleteSelectedAriaLabel": "Delete {{count}} selected words"
     },
     "message": {
       "empty": "No words yet. Add some words to start practicing.",
       "addFailed": "Failed to add word",
-      "deleteConfirm": "Delete this word?"
+      "deleteConfirm": "Delete this word?",
+      "deleteSelectedConfirm": "Delete {{count}} selected words?"
     }
   },
   "voiceSelector": {

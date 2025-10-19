@@ -81,6 +81,22 @@
   border-radius: 4px;
   margin-bottom: 0.5rem;
   background-color: var(--color-bg-white);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.wordItem:hover {
+  background-color: var(--color-bg-light, #f8f9fa);
+}
+
+.wordItem:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.wordItem.selected {
+  background-color: var(--color-primary-light, #e3f2fd);
+  border-color: var(--color-primary);
 }
 
 .wordText {
@@ -97,5 +113,28 @@
 }
 
 .deleteButton:hover {
+  background-color: var(--color-error-hover);
+}
+
+.bulkActions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: var(--color-bg-light, #f8f9fa);
+  border-radius: 4px;
+}
+
+.deleteSelectedButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-error);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.deleteSelectedButton:hover {
   background-color: var(--color-error-hover);
 }

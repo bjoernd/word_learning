@@ -33,6 +33,13 @@ export async function addWord(wordText: string): Promise<number> {
     throw new Error('Word too long (max 100 characters)');
   }
 
+  // Validate: check for duplicates (case-insensitive)
+  const existingWords = await db.words.toArray();
+  const duplicate = existingWords.find(w => w.word.toLowerCase() === trimmed.toLowerCase());
+  if (duplicate) {
+    throw new Error('Word already exists');
+  }
+
   // Validate: word count limit
   const count = await db.words.count();
   if (count >= MAX_WORD_COUNT) {

@@ -49,12 +49,15 @@
     "button": {
       "add": "Wort hinzufügen",
       "delete": "Löschen",
-      "deleteAriaLabel": "Entferne Wort {{word}}"
+      "deleteAriaLabel": "Entferne Wort {{word}}",
+      "deleteSelected": "Ausgewählte löschen ({{count}})",
+      "deleteSelectedAriaLabel": "Lösche {{count}} ausgewählte Worte"
     },
     "message": {
       "empty": "Noch keine Worte zum Üben",
       "addFailed": "Hinzufügen fehlgeschlagen",
-      "deleteConfirm": "Dieses Wort löschen?"
+      "deleteConfirm": "Dieses Wort löschen?",
+      "deleteSelectedConfirm": "{{count}} ausgewählte Worte löschen?"
     }
   },
   "voiceSelector": {
