@@ -1,78 +1,78 @@
 {
   "app": {
-    "title": "[DE] Word Learning",
+    "title": "Word Learning",
     "nav": {
-      "practice": "[DE] Practice",
-      "manageWords": "[DE] Manage Words",
-      "voiceSelector": "[DE] Voice Selector"
+      "practice": "Üben",
+      "manageWords": "Wort-Verwaltung",
+      "voiceSelector": "Stimme auswählen"
     }
   },
   "practice": {
-    "loading": "[DE] Loading...",
+    "loading": "Laden...",
     "empty": {
-      "message": "[DE] No words available for practice.",
-      "guidance": "[DE] Please add some words in the Manage Words tab first."
+      "message": "Keine Worte zum Üben verfügbar",
+      "guidance": "Bitte füge zuerst ein paar Worte hinzu."
     },
     "start": {
-      "heading": "[DE] Ready to Practice?",
-      "instruction": "[DE] Click Start to hear the first word.",
-      "button": "[DE] Start Practice"
+      "heading": "Bereit zum Üben?",
+      "instruction": "Klicke Start für das erste Wort",
+      "button": "Übung starten"
     },
     "answer": {
-      "score": "[DE] Score: {{score}}/{{total}}",
-      "placeholder": "[DE] Type the word you heard",
-      "replayButton": "🔊 [DE] Replay Word",
-      "submitButton": "[DE] Submit",
-      "correct": "[DE] Correct!",
-      "incorrect": "[DE] Incorrect",
+      "score": "Ergebnis: {{score}}/{{total}}",
+      "placeholder": "Gib das Wort ein, das Du gehört hast",
+      "replayButton": "🔊 Nochmal abspielen",
+      "submitButton": "Eingeben",
+      "correct": "Richtig!",
+      "incorrect": "Falsch!",
       "correctIcon": "✓",
       "incorrectIcon": "✗"
     },
     "comparison": {
-      "correctLabel": "[DE] Correct:",
-      "yourAnswerLabel": "[DE] Your answer:",
+      "correctLabel": "Richtig:",
+      "yourAnswerLabel": "Deine Antwort:",
       "missingChar": "_"
     },
     "summary": {
-      "heading": "[DE] Session Complete!",
-      "scoreOf": "[DE]  out of ",
-      "restartButton": "[DE] Restart"
+      "heading": "Abschnitt beendet",
+      "scoreOf": " von ",
+      "restartButton": "Nochmal"
     }
   },
   "wordManager": {
-    "heading": "[DE] Manage Words",
-    "wordCount": "[DE] Words: {{count}} / 1,000",
+    "heading": "Worte verwalten",
+    "wordCount": "Worte: {{count}} / 1,000",
     "input": {
-      "placeholder": "[DE] Enter a word",
-      "ariaLabel": "[DE] New word to add"
+      "placeholder": "Gib ein Wort ein",
+      "ariaLabel": "Neues Wort"
     },
     "button": {
-      "add": "[DE] Add Word",
-      "delete": "[DE] Delete",
-      "deleteAriaLabel": "[DE] Delete word {{word}}"
+      "add": "Wort hinzufügen",
+      "delete": "Löschen",
+      "deleteAriaLabel": "Entferne Wort {{word}}"
     },
     "message": {
-      "empty": "[DE] No words yet. Add some words to start practicing.",
-      "addFailed": "[DE] Failed to add word",
-      "deleteConfirm": "[DE] Delete this word?"
+      "empty": "Noch keine Worte zum Üben",
+      "addFailed": "Hinzufügen fehlgeschlagen",
+      "deleteConfirm": "Dieses Wort löschen?"
     }
   },
   "voiceSelector": {
-    "loading": "[DE] Loading voices...",
-    "heading": "[DE] Voice Selector",
-    "currentlySelected": "[DE] Currently Selected:",
-    "allVoices": "[DE] All Voices ({{count}})",
-    "instructions": "[DE] Use arrow keys to navigate, Enter or Space to play, or double-click a voice",
+    "loading": "Lade Stimmen...",
+    "heading": "Stimm-Auswahl",
+    "currentlySelected": "Derzeit ausgewählt:",
+    "allVoices": "Alle Stimmen: ({{count}})",
+    "instructions": "Benutze Pfeiltasten zum Navigieren, Enter, Leertaste oder Doppelklick zum abspielen",
     "voice": {
-      "language": "[DE] Language: {{lang}}",
-      "default": "[DE] Default",
-      "local": "[DE] Local",
-      "practice": "[DE] Practice",
-      "practiceVoice": "[DE] Practice voice: {{voiceName}}",
-      "playing": "[DE] Playing...",
-      "playTest": "[DE] Play \"{{phrase}}\"",
-      "setButton": "[DE] Set as Practice Voice",
-      "testPhrase": "[DE] Hello world"
+      "language": "Sprache: {{lang}}",
+      "default": "Standard",
+      "local": "Ausgewählt",
+      "practice": "Übung",
+      "practiceVoice": "Stimme zum Üben: {{voiceName}}",
+      "playing": "Abspielen...",
+      "playTest": "Sage \"{{phrase}}\"",
+      "setButton": "Stimme nutzen",
+      "testPhrase": "Hello world"
     }
   }
 }

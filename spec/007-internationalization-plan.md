@@ -315,12 +315,12 @@ Convert each component to use `useTranslation` hook and translation keys:
 
 ### Phase 5: German Translation
 
-17. **Translation Handoff**
+17. **Translation Handoff** ✅
     - Provide Bjoern with `de/translation.json` template
     - Include context notes for ambiguous strings
     - Document interpolation variables ({{score}}, {{count}}, etc.)
 
-18. **Translation Integration**
+18. **Translation Integration** ✅
     - Replace placeholder translations with Bjoern's German translations
     - Verify all translations render correctly
     - Test for layout issues (German text often longer than English)
