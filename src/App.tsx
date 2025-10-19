@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Practice } from './components/Practice/Practice';
 import { WordManager } from './components/WordManager/WordManager';
 import { VoiceSelector } from './components/VoiceSelector/VoiceSelector';
+import { LanguageSwitcher } from './components/LanguageSwitcher/LanguageSwitcher';
 import styles from './App.module.css';
 import './i18n/config';
 
@@ -19,18 +20,23 @@ function App() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <h1>Word Learning</h1>
-        <nav className={styles.nav}>
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={activeTab === tab.id ? styles.active : ''}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        <div className={styles.headerContent}>
+          <div>
+            <h1>Word Learning</h1>
+            <nav className={styles.nav}>
+              {TABS.map(tab => (
+                <button
+                  key={tab.id}
+                  className={activeTab === tab.id ? styles.active : ''}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <LanguageSwitcher />
+        </div>
       </header>
       <main className={styles.main}>
         {activeTab === 'practice' && <Practice />}
