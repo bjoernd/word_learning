@@ -53,6 +53,34 @@ npm test            # Run tests with Vitest
   - `play(sound)`: Plays a sound effect and returns a Promise
   - Uses HTML5 Audio API with graceful fallback on errors
 
+### Utilities (`src/utils/`)
+
+- **browser.ts**: Environment detection
+  - `isBrowser()`: Checks if running in browser vs server/Node environment
+
+- **keyboard.ts**: Keyboard event helpers
+  - `handleEnterKey()`: Reduces duplication in Enter key handlers
+
+- **errorHandling.ts**: Standardized error logging
+  - `logError()`: General error logging with context
+  - `handleAudioError()`: Audio-specific error handling (uses warn level)
+
+- **characterComparison.ts**: CSS class generation for character matching
+  - `getCharacterClassName()`: Maps CharacterMatch types to CSS classes
+
+### Hooks (`src/hooks/`)
+
+- **useVoices.ts**: Custom hook for speech synthesis voice management
+  - Loads and filters available voices
+  - Handles voiceschanged events
+  - Optional filter function for voice selection
+
+### Types (`src/types/`)
+
+- **index.ts**: Core type definitions
+  - `Word`: Database entity with id and word text
+  - `PracticeWord`: Practice session record with answer and correctness
+
 ### Components (`src/components/`)
 
 - **App.tsx**: Root component with tab-based navigation
@@ -61,8 +89,13 @@ npm test            # Run tests with Vitest
 
 - **Practice**: Main practice session view (10-word sessions)
   - Uses lottie-web for visual feedback animations (confetti on correct/incorrect, celebration on completion)
-  - Animation files: `good.json`, `bad.json`, `winner-ok.json` (60-90% score), `winner-perfect.json` (90%+ score)
+  - Animation files from `src/assets/animations/`: `good.json`, `bad.json`, `winner-ok.json` (60-90% score), `winner-perfect.json` (90%+ score)
   - Manages session state, user input, feedback timing, and audio/visual feedback coordination
+  - Subcomponents:
+    - **AnswerInput.tsx**: Input field with submission, replay button, and inline feedback display
+    - **CharacterComparison.tsx**: Character-by-character comparison with color-coded matching
+    - **ConfettiAnimation.tsx**: Lottie animation renderer with positioning and cleanup
+    - **SessionSummary.tsx**: Completion screen with score and celebration animation
 
 - **WordManager**: Add/delete words from database
 

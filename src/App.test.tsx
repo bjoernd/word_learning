@@ -1,7 +1,7 @@
 // ABOUTME: Tests for the App component.
 // ABOUTME: Validates tab navigation, rendering, and active tab styling.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 import styles from './App.module.css';
@@ -20,24 +20,33 @@ describe('App', () => {
     vi.mocked(speech.speechService.getVoices).mockReturnValue([]);
   });
 
-  it('should render all three tab buttons', () => {
+  it('should render all three tab buttons', async () => {
     render(<App />);
 
-    expect(screen.getByRole('button', { name: 'Practice' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Practice' })).toBeInTheDocument();
+    });
+
     expect(screen.getByRole('button', { name: 'Manage Words' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Voice Selector' })).toBeInTheDocument();
   });
 
-  it('should show Practice tab by default', () => {
+  it('should show Practice tab by default', async () => {
     render(<App />);
 
     const practiceButton = screen.getByRole('button', { name: 'Practice' });
-    expect(practiceButton).toHaveClass(styles.active);
+    await waitFor(() => {
+      expect(practiceButton).toHaveClass(styles.active);
+    });
   });
 
   it('should switch to Manage Words tab when clicked', async () => {
     const user = userEvent.setup();
     render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Practice' })).toBeInTheDocument();
+    });
 
     const manageButton = screen.getByRole('button', { name: 'Manage Words' });
     await user.click(manageButton);
@@ -50,6 +59,10 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Practice' })).toBeInTheDocument();
+    });
+
     const voiceButton = screen.getByRole('button', { name: 'Voice Selector' });
     await user.click(voiceButton);
 
@@ -60,6 +73,10 @@ describe('App', () => {
   it('should switch back to Practice tab when clicked', async () => {
     const user = userEvent.setup();
     render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Practice' })).toBeInTheDocument();
+    });
 
     const manageButton = screen.getByRole('button', { name: 'Manage Words' });
     const practiceButton = screen.getByRole('button', { name: 'Practice' });
@@ -83,7 +100,9 @@ describe('App', () => {
     const voiceButton = screen.getByRole('button', { name: 'Voice Selector' });
 
     // Initially only practice is active
-    expect(practiceButton).toHaveClass(styles.active);
+    await waitFor(() => {
+      expect(practiceButton).toHaveClass(styles.active);
+    });
     expect(manageButton).not.toHaveClass(styles.active);
     expect(voiceButton).not.toHaveClass(styles.active);
 

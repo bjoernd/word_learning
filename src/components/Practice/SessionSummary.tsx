@@ -2,7 +2,7 @@
 // ABOUTME: Shows winner animations based on score percentage (60%+ good, 90%+ perfect).
 import { ConfettiAnimation } from './ConfettiAnimation';
 import winnerOkAnimation from '../../assets/animations/winner-ok.json';
-import winnerPerfectAnimation from '../../assets/animations/winner-perferct.json';
+import winnerPerfectAnimation from '../../assets/animations/winner-perfect.json';
 import styles from './Practice.module.css';
 
 const CENTER_POSITION = 50;
