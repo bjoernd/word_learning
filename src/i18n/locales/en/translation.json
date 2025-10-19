@@ -1,0 +1,78 @@
+{
+  "app": {
+    "title": "Word Learning",
+    "nav": {
+      "practice": "Practice",
+      "manageWords": "Manage Words",
+      "voiceSelector": "Voice Selector"
+    }
+  },
+  "practice": {
+    "loading": "Loading...",
+    "empty": {
+      "message": "No words available for practice.",
+      "guidance": "Please add some words in the Manage Words tab first."
+    },
+    "start": {
+      "heading": "Ready to Practice?",
+      "instruction": "Click Start to hear the first word.",
+      "button": "Start Practice"
+    },
+    "answer": {
+      "score": "Score: {{score}}/{{total}}",
+      "placeholder": "Type the word you heard",
+      "replayButton": "🔊 Replay Word",
+      "submitButton": "Submit",
+      "correct": "Correct!",
+      "incorrect": "Incorrect",
+      "correctIcon": "✓",
+      "incorrectIcon": "✗"
+    },
+    "comparison": {
+      "correctLabel": "Correct:",
+      "yourAnswerLabel": "Your answer:",
+      "missingChar": "_"
+    },
+    "summary": {
+      "heading": "Session Complete!",
+      "scoreOf": " out of ",
+      "restartButton": "Restart"
+    }
+  },
+  "wordManager": {
+    "heading": "Manage Words",
+    "wordCount": "Words: {{count}} / 1,000",
+    "input": {
+      "placeholder": "Enter a word",
+      "ariaLabel": "New word to add"
+    },
+    "button": {
+      "add": "Add Word",
+      "delete": "Delete",
+      "deleteAriaLabel": "Delete word {{word}}"
+    },
+    "message": {
+      "empty": "No words yet. Add some words to start practicing.",
+      "addFailed": "Failed to add word",
+      "deleteConfirm": "Delete this word?"
+    }
+  },
+  "voiceSelector": {
+    "loading": "Loading voices...",
+    "heading": "Voice Selector",
+    "currentlySelected": "Currently Selected:",
+    "allVoices": "All Voices ({{count}})",
+    "instructions": "Use arrow keys to navigate, Enter or Space to play, or double-click a voice",
+    "voice": {
+      "language": "Language: {{lang}}",
+      "default": "Default",
+      "local": "Local",
+      "practice": "Practice",
+      "practiceVoice": "Practice voice: {{voiceName}}",
+      "playing": "Playing...",
+      "playTest": "Play \"{{phrase}}\"",
+      "setButton": "Set as Practice Voice",
+      "testPhrase": "Hello world"
+    }
+  }
+}

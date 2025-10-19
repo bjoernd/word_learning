@@ -1,0 +1,78 @@
+{
+  "app": {
+    "title": "[DE] Word Learning",
+    "nav": {
+      "practice": "[DE] Practice",
+      "manageWords": "[DE] Manage Words",
+      "voiceSelector": "[DE] Voice Selector"
+    }
+  },
+  "practice": {
+    "loading": "[DE] Loading...",
+    "empty": {
+      "message": "[DE] No words available for practice.",
+      "guidance": "[DE] Please add some words in the Manage Words tab first."
+    },
+    "start": {
+      "heading": "[DE] Ready to Practice?",
+      "instruction": "[DE] Click Start to hear the first word.",
+      "button": "[DE] Start Practice"
+    },
+    "answer": {
+      "score": "[DE] Score: {{score}}/{{total}}",
+      "placeholder": "[DE] Type the word you heard",
+      "replayButton": "🔊 [DE] Replay Word",
+      "submitButton": "[DE] Submit",
+      "correct": "[DE] Correct!",
+      "incorrect": "[DE] Incorrect",
+      "correctIcon": "✓",
+      "incorrectIcon": "✗"
+    },
+    "comparison": {
+      "correctLabel": "[DE] Correct:",
+      "yourAnswerLabel": "[DE] Your answer:",
+      "missingChar": "_"
+    },
+    "summary": {
+      "heading": "[DE] Session Complete!",
+      "scoreOf": "[DE]  out of ",
+      "restartButton": "[DE] Restart"
+    }
+  },
+  "wordManager": {
+    "heading": "[DE] Manage Words",
+    "wordCount": "[DE] Words: {{count}} / 1,000",
+    "input": {
+      "placeholder": "[DE] Enter a word",
+      "ariaLabel": "[DE] New word to add"
+    },
+    "button": {
+      "add": "[DE] Add Word",
+      "delete": "[DE] Delete",
+      "deleteAriaLabel": "[DE] Delete word {{word}}"
+    },
+    "message": {
+      "empty": "[DE] No words yet. Add some words to start practicing.",
+      "addFailed": "[DE] Failed to add word",
+      "deleteConfirm": "[DE] Delete this word?"
+    }
+  },
+  "voiceSelector": {
+    "loading": "[DE] Loading voices...",
+    "heading": "[DE] Voice Selector",
+    "currentlySelected": "[DE] Currently Selected:",
+    "allVoices": "[DE] All Voices ({{count}})",
+    "instructions": "[DE] Use arrow keys to navigate, Enter or Space to play, or double-click a voice",
+    "voice": {
+      "language": "[DE] Language: {{lang}}",
+      "default": "[DE] Default",
+      "local": "[DE] Local",
+      "practice": "[DE] Practice",
+      "practiceVoice": "[DE] Practice voice: {{voiceName}}",
+      "playing": "[DE] Playing...",
+      "playTest": "[DE] Play \"{{phrase}}\"",
+      "setButton": "[DE] Set as Practice Voice",
+      "testPhrase": "[DE] Hello world"
+    }
+  }
+}

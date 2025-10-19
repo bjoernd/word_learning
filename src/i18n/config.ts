@@ -3,6 +3,8 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import enTranslations from './locales/en/translation.json';
+import deTranslations from './locales/de/translation.json';
 
 const STORAGE_KEY = 'userLanguage';
 const DEFAULT_LANGUAGE = 'de';
@@ -36,10 +38,10 @@ i18n
 
     resources: {
       en: {
-        translation: {},
+        translation: enTranslations,
       },
       de: {
-        translation: {},
+        translation: deTranslations,
       },
     },
   });
