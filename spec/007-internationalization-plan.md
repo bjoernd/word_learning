@@ -307,7 +307,7 @@ Convert each component to use `useTranslation` hook and translation keys:
     - Test all dynamic string interpolations (scores, counts, etc.)
     - Test on different browsers
 
-16. **Unit Tests**
+16. **Unit Tests** ✅
     - Test LanguageSwitcher component
     - Test language persistence
     - Add i18n test utilities to `src/test/setup.ts`
