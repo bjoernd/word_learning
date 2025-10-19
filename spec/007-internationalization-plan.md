@@ -258,7 +258,7 @@ Simple button group toggle:
 
 Convert each component to use `useTranslation` hook and translation keys:
 
-8. **App.tsx**
+8. **App.tsx** ✅
    - Application title
    - Navigation tab labels
 

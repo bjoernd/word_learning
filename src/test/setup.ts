@@ -25,3 +25,21 @@ vi.mock('lottie-web', () => ({
     }),
   },
 }));
+
+// Mock localStorage to return English as the default language for tests
+const localStorageMock: { [key: string]: string } = {
+  'userLanguage': 'en'
+};
+
+global.Storage.prototype.getItem = vi.fn((key: string) => localStorageMock[key] || null);
+global.Storage.prototype.setItem = vi.fn((key: string, value: string) => {
+  localStorageMock[key] = value;
+});
+global.Storage.prototype.removeItem = vi.fn((key: string) => {
+  delete localStorageMock[key];
+});
+global.Storage.prototype.clear = vi.fn(() => {
+  for (const key in localStorageMock) {
+    delete localStorageMock[key];
+  }
+});
