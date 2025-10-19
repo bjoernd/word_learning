@@ -3,6 +3,7 @@ import { Practice } from './components/Practice/Practice';
 import { WordManager } from './components/WordManager/WordManager';
 import { VoiceSelector } from './components/VoiceSelector/VoiceSelector';
 import styles from './App.module.css';
+import './i18n/config';
 
 type TabType = 'practice' | 'manage' | 'voice';
 
