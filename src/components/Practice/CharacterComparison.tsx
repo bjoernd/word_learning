@@ -1,5 +1,6 @@
 // ABOUTME: Character-by-character comparison display component for practice feedback
 // ABOUTME: Shows correct word and user answer with color-coded character matching
+import { useTranslation } from 'react-i18next';
 import { compareAnswers } from '../../services/practiceLogic';
 import { getCharacterClassName } from '../../utils/characterComparison';
 import styles from './Practice.module.css';
@@ -13,6 +14,7 @@ export function CharacterComparison({
   correctWord,
   userAnswer
 }: CharacterComparisonProps) {
+  const { t } = useTranslation();
   const comparison = compareAnswers(correctWord, userAnswer);
   const correct = correctWord.toLowerCase();
   const user = userAnswer.toLowerCase();
@@ -20,7 +22,7 @@ export function CharacterComparison({
   return (
     <div className={styles.characterComparison}>
       <div className={styles.comparisonRow}>
-        <span className={styles.label}>Correct:</span>
+        <span className={styles.label}>{t('practice.comparison.correctLabel')}</span>
         <div className={styles.characters}>
           {correct.split('').map((char, idx) => (
             <span
@@ -33,7 +35,7 @@ export function CharacterComparison({
         </div>
       </div>
       <div className={styles.comparisonRow}>
-        <span className={styles.label}>Your answer:</span>
+        <span className={styles.label}>{t('practice.comparison.yourAnswerLabel')}</span>
         <div className={styles.characters}>
           {user.split('').map((char, idx) => (
             <span
@@ -46,7 +48,7 @@ export function CharacterComparison({
           {comparison.slice(user.length).map((match, idx) => (
             match === 'missing' && (
               <span key={user.length + idx} className={getCharacterClassName('missing', styles)}>
-                _
+                {t('practice.comparison.missingChar')}
               </span>
             )
           ))}
