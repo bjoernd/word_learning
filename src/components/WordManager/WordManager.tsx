@@ -1,12 +1,14 @@
 // ABOUTME: UI component for managing the word database
 // ABOUTME: Provides interface to add and delete words
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, addWord, deleteWord } from '../../services/database';
 import { handleEnterKey } from '../../utils/keyboard';
 import styles from './WordManager.module.css';
 
 export function WordManager() {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const words = useLiveQuery(() => db.words.toArray()) ?? [];
@@ -22,14 +24,14 @@ export function WordManager() {
         if (error instanceof Error) {
           setErrorMessage(error.message);
         } else {
-          setErrorMessage('Failed to add word');
+          setErrorMessage(t('wordManager.message.addFailed'));
         }
       }
     }
   };
 
   const handleDeleteWord = async (id: number) => {
-    if (window.confirm('Delete this word?')) {
+    if (window.confirm(t('wordManager.message.deleteConfirm'))) {
       await deleteWord(id);
     }
   };
@@ -37,8 +39,8 @@ export function WordManager() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Manage Words</h2>
-        <p className={styles.wordCount}>Words: {words.length} / 1,000</p>
+        <h2>{t('wordManager.heading')}</h2>
+        <p className={styles.wordCount}>{t('wordManager.wordCount', { count: words.length })}</p>
       </div>
 
       <div className={styles.addSection}>
@@ -47,12 +49,12 @@ export function WordManager() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={(e) => handleEnterKey(e, handleAddWord)}
-          placeholder="Enter a word"
+          placeholder={t('wordManager.input.placeholder')}
           className={styles.input}
-          aria-label="New word to add"
+          aria-label={t('wordManager.input.ariaLabel')}
         />
         <button onClick={handleAddWord} className={styles.addButton}>
-          Add Word
+          {t('wordManager.button.add')}
         </button>
       </div>
 
@@ -64,7 +66,7 @@ export function WordManager() {
 
       {words.length === 0 ? (
         <p className={styles.emptyMessage}>
-          No words yet. Add some words to start practicing.
+          {t('wordManager.message.empty')}
         </p>
       ) : (
         <ul className={styles.wordList}>
@@ -74,9 +76,9 @@ export function WordManager() {
               <button
                 onClick={() => handleDeleteWord(word.id!)}
                 className={styles.deleteButton}
-                aria-label={`Delete word ${word.word}`}
+                aria-label={t('wordManager.button.deleteAriaLabel', { word: word.word })}
               >
-                Delete
+                {t('wordManager.button.delete')}
               </button>
             </li>
           ))}

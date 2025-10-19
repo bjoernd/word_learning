@@ -281,7 +281,7 @@ Convert each component to use `useTranslation` hook and translation keys:
     - Score display (with interpolation)
     - Restart button
 
-13. **WordManager.tsx**
+13. **WordManager.tsx** ✅
     - Heading
     - Word count (with interpolation)
     - Input placeholder and labels
