@@ -12,6 +12,7 @@ Word Learning is a browser-based spelling practice app for children. It uses tex
 - **Build Tool**: Vite
 - **Database**: IndexedDB via Dexie.js with `dexie-react-hooks`
 - **Text-to-Speech**: Browser-native Web Speech API (SpeechSynthesis)
+- **Internationalization**: react-i18next with localStorage persistence
 - **Testing**: Vitest with jsdom environment
 - **Styling**: CSS Modules
 
@@ -101,6 +102,31 @@ npm test            # Run tests with Vitest
 
 - **VoiceSelector**: Browse and select TTS voices
 
+- **LanguageSwitcher**: UI language toggle (English/German)
+
+### Internationalization (`src/i18n/`)
+
+- **config.ts**: i18next configuration with localStorage detection
+  - Default language: German (with English fallback)
+  - Language preference stored in localStorage under key `'userLanguage'`
+
+- **locales/**: Translation files
+  - `en/translation.json`: English translations (47 strings)
+  - `de/translation.json`: German translations (47 strings)
+
+- **types.ts**: TypeScript type definitions for translation keys
+  - Provides autocomplete and type safety for translation keys
+  - Prevents typos in `t()` function calls
+
+**Translation Key Structure**: `{component}.{context}.{identifier}`
+- Example: `app.nav.practice` → "Practice" / "Üben"
+- Supports interpolation: `{{score}}`, `{{count}}`, `{{total}}`
+
+**Language Scope**:
+- UI language: Switchable between English and German
+- Practice words: English only (with English TTS voices)
+- Future: Multi-language word practice with per-language voice selection
+
 ### Application Flow
 
 1. User manages word list via WordManager component
@@ -143,9 +169,11 @@ Future versions planned to add word statistics and grouping capabilities.
 
 - Test environment: jsdom with vitest
 - Test database: fake-indexeddb for IndexedDB mocking
-- Setup file: `src/test/setup.ts` mocks:
-  - `Audio` element for sound effects testing
-  - `lottie-web` for animation testing
+- Setup file: `src/test/setup.ts` configures:
+  - i18next initialized with English translations for consistent test output
+  - localStorage mock with `userLanguage: 'en'` default
+  - `Audio` element mock for sound effects testing
+  - `lottie-web` mock for animation testing
   - Imports `@testing-library/jest-dom` for DOM matchers
 
 ## File Header Convention
