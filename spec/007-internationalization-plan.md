@@ -276,7 +276,7 @@ Convert each component to use `useTranslation` hook and translation keys:
 11. **CharacterComparison.tsx** ✅
     - Comparison labels
 
-12. **SessionSummary.tsx**
+12. **SessionSummary.tsx** ✅
     - Completion heading
     - Score display (with interpolation)
     - Restart button
