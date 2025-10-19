@@ -1,14 +1,14 @@
 // ABOUTME: Voice selector component for testing and choosing TTS voices.
 // ABOUTME: Allows keyboard navigation through available voices and plays test phrase.
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { speechService } from '../../services/speech';
 import { useVoices } from '../../hooks/useVoices';
 import { handleAudioError } from '../../utils/errorHandling';
 import styles from './VoiceSelector.module.css';
 
-const TEST_PHRASE = 'Hello world';
-
 export function VoiceSelector() {
+  const { t } = useTranslation();
   const voices = useVoices((voice) => voice.lang.startsWith('en'));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -25,7 +25,7 @@ export function VoiceSelector() {
 
     setIsPlaying(true);
     try {
-      await speechService.speak(TEST_PHRASE, voices[voiceIndex]);
+      await speechService.speak(t('voiceSelector.voice.testPhrase'), voices[voiceIndex]);
     } catch (err) {
       handleAudioError('Speech', err);
     } finally {
@@ -60,7 +60,7 @@ export function VoiceSelector() {
   if (voices.length === 0) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>Loading voices...</div>
+        <div className={styles.loading}>{t('voiceSelector.loading')}</div>
       </div>
     );
   }
@@ -70,18 +70,18 @@ export function VoiceSelector() {
   return (
     <div className={styles.container} onKeyDown={handleKeyDown} tabIndex={0}>
       <div className={styles.header}>
-        <h2>Voice Selector</h2>
-        <p>Use arrow keys to navigate, Enter or Space to play, or double-click a voice</p>
+        <h2>{t('voiceSelector.heading')}</h2>
+        <p>{t('voiceSelector.instructions')}</p>
       </div>
 
       <div className={styles.currentVoice}>
-        <h3>Currently Selected:</h3>
+        <h3>{t('voiceSelector.currentlySelected')}</h3>
         <div className={styles.voiceInfo}>
           <div className={styles.voiceName}>{selectedVoice.name}</div>
           <div className={styles.voiceDetails}>
-            <span>Language: {selectedVoice.lang}</span>
-            {selectedVoice.default && <span className={styles.badge}>Default</span>}
-            {selectedVoice.localService && <span className={styles.badge}>Local</span>}
+            <span>{t('voiceSelector.voice.language', { lang: selectedVoice.lang })}</span>
+            {selectedVoice.default && <span className={styles.badge}>{t('voiceSelector.voice.default')}</span>}
+            {selectedVoice.localService && <span className={styles.badge}>{t('voiceSelector.voice.local')}</span>}
           </div>
         </div>
         <div className={styles.buttons}>
@@ -90,24 +90,24 @@ export function VoiceSelector() {
             disabled={isPlaying}
             className={styles.playButton}
           >
-            {isPlaying ? 'Playing...' : 'Play "Hello world"'}
+            {isPlaying ? t('voiceSelector.voice.playing') : t('voiceSelector.voice.playTest', { phrase: t('voiceSelector.voice.testPhrase') })}
           </button>
           <button
             onClick={setPracticeVoiceHandler}
             className={styles.setPracticeButton}
           >
-            Set as Practice Voice
+            {t('voiceSelector.voice.setButton')}
           </button>
         </div>
         {practiceVoice && (
           <div className={styles.practiceInfo}>
-            Practice voice: {practiceVoice.name}
+            {t('voiceSelector.voice.practiceVoice', { voiceName: practiceVoice.name })}
           </div>
         )}
       </div>
 
       <div className={styles.voiceList}>
-        <h3>All Voices ({voices.length})</h3>
+        <h3>{t('voiceSelector.allVoices', { count: voices.length })}</h3>
         <div className={styles.list}>
           {voices.map((voice, index) => (
             <div
@@ -119,7 +119,7 @@ export function VoiceSelector() {
               <div className={styles.voiceItemName}>
                 {voice.name}
                 {practiceVoice?.voiceURI === voice.voiceURI && (
-                  <span className={styles.practiceBadge}>Practice</span>
+                  <span className={styles.practiceBadge}>{t('voiceSelector.voice.practice')}</span>
                 )}
               </div>
               <div className={styles.voiceItemLang}>{voice.lang}</div>

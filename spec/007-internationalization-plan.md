@@ -290,7 +290,7 @@ Convert each component to use `useTranslation` hook and translation keys:
     - Confirmation dialog
     - ARIA labels (with interpolation)
 
-14. **VoiceSelector.tsx**
+14. **VoiceSelector.tsx** ✅
     - Loading state
     - Headings (with interpolation for count)
     - Instructions
