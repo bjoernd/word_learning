@@ -1,6 +1,7 @@
 // ABOUTME: Practice component for vocabulary learning sessions with TTS playback and feedback.
 // ABOUTME: Manages 10-word sessions, answer validation, scoring, and character-by-character comparison.
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getRandomWords, getWordCount } from '../../services/database';
 import { Word, PracticeWord } from '../../types';
 import { speechService } from '../../services/speech';
@@ -24,6 +25,7 @@ const GOOD_SCORE_THRESHOLD = 60;
 type FeedbackType = 'correct' | 'incorrect' | null;
 
 export function Practice() {
+  const { t } = useTranslation();
   const [sessionWords, setSessionWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<PracticeWord[]>([]);
@@ -170,15 +172,15 @@ export function Practice() {
   };
 
   if (isLoading) {
-    return <div className={styles.container}>Loading...</div>;
+    return <div className={styles.container}>{t('practice.loading')}</div>;
   }
 
   if (sessionWords.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
-          <p>No words available for practice.</p>
-          <p>Please add some words in the Manage Words tab first.</p>
+          <p>{t('practice.empty.message')}</p>
+          <p>{t('practice.empty.guidance')}</p>
         </div>
       </div>
     );
@@ -196,10 +198,10 @@ export function Practice() {
     return (
       <div className={styles.container}>
         <div className={styles.startPrompt}>
-          <h2>Ready to Practice?</h2>
-          <p>Click Start to hear the first word.</p>
+          <h2>{t('practice.start.heading')}</h2>
+          <p>{t('practice.start.instruction')}</p>
           <button onClick={handleStart} className={styles.startButton}>
-            Start Practice
+            {t('practice.start.button')}
           </button>
         </div>
       </div>

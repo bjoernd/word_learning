@@ -262,7 +262,7 @@ Convert each component to use `useTranslation` hook and translation keys:
    - Application title
    - Navigation tab labels
 
-9. **Practice.tsx**
+9. **Practice.tsx** ✅
    - Loading state
    - Empty state messages
    - Start screen text
