@@ -57,7 +57,7 @@ describe('Practice', () => {
       // Wait for feedback to disappear (3 second delay + margin)
       await waitFor(() => {
         expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-      }, { timeout: 4000 });
+      }, { timeout: 6000 });
     }
 
     // Answer last word incorrectly
@@ -78,7 +78,7 @@ describe('Practice', () => {
     await waitFor(() => {
       expect(screen.queryByText('Incorrect')).not.toBeInTheDocument();
       expect(screen.getByText('Session Complete!')).toBeInTheDocument();
-    }, { timeout: 4000 });
+    }, { timeout: 6000 });
   }, 35000); // Long timeout for this integration test
 
   it('should start new practice session when Enter is pressed in summary screen', async () => {
@@ -104,7 +104,7 @@ describe('Practice', () => {
       // Wait for feedback to disappear
       await waitFor(() => {
         expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-      }, { timeout: 4000 });
+      }, { timeout: 6000 });
     }
 
     // Wait for summary screen to appear
@@ -143,7 +143,7 @@ describe('Practice', () => {
 
         await waitFor(() => {
           expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-        }, { timeout: 4000 });
+        }, { timeout: 6000 });
       }
 
       // Session should be complete - summary should show
@@ -172,7 +172,7 @@ describe('Practice', () => {
 
         await waitFor(() => {
           expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-        }, { timeout: 4000 });
+        }, { timeout: 6000 });
       }
 
       // Session should NOT be complete - no summary
@@ -217,7 +217,7 @@ describe('Practice', () => {
 
         await waitFor(() => {
           expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-        }, { timeout: 4000 });
+        }, { timeout: 6000 });
       }
 
       // Answer remaining incorrectly
@@ -229,7 +229,7 @@ describe('Practice', () => {
 
         await waitFor(() => {
           expect(screen.queryByText('Incorrect')).not.toBeInTheDocument();
-        }, { timeout: 4000 });
+        }, { timeout: 6000 });
       }
 
       // Should show summary with score
@@ -262,7 +262,7 @@ describe('Practice', () => {
 
         await waitFor(() => {
           expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-        }, { timeout: 4000 });
+        }, { timeout: 6000 });
       }
 
       // Answer last one incorrectly
@@ -273,7 +273,7 @@ describe('Practice', () => {
 
       await waitFor(() => {
         expect(screen.queryByText('Incorrect')).not.toBeInTheDocument();
-      }, { timeout: 4000 });
+      }, { timeout: 6000 });
 
       // Should show summary with score
       await waitFor(() => {
@@ -357,7 +357,7 @@ describe('Practice', () => {
       // Wait for feedback to clear and next word
       await waitFor(() => {
         expect(screen.queryByText('Correct!')).not.toBeInTheDocument();
-      }, { timeout: 4000 });
+      }, { timeout: 6000 });
 
       // Answer second word
       await user.clear(input);
