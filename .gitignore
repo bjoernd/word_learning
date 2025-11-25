@@ -30,3 +30,10 @@ vitest.config.js
 *.sw?
 
 .cj/
+
+deploy.sh
+server-setup.sh
+inspect-server.sh
+spelling.conf
+default.conf
+DEPLOYMENT.md
