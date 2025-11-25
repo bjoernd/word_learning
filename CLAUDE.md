@@ -38,6 +38,7 @@ npm test            # Run tests with Vitest
 - **database.ts**: IndexedDB operations via Dexie
   - Schema: `words` table with `++id, word` fields
   - Exports: `addWord()`, `deleteWord()`, `getAllWords()`, `getWordCount()`, `getRandomWords()`
+  - Validation: Case-insensitive duplicate checking, length limits, word count limits
 
 - **speech.ts**: Text-to-speech wrapper around SpeechSynthesis API
   - Manages voice selection persistence via localStorage
@@ -99,6 +100,9 @@ npm test            # Run tests with Vitest
     - **SessionSummary.tsx**: Completion screen with score and celebration animation
 
 - **WordManager**: Add/delete words from database
+  - Multi-select functionality: Click to select/deselect words, Ctrl/Cmd+click to add to selection
+  - Bulk deletion: Delete multiple selected words at once with single confirmation
+  - Visual feedback: Selected words are highlighted
 
 - **VoiceSelector**: Browse and select TTS voices
 
@@ -142,7 +146,7 @@ npm test            # Run tests with Vitest
 
 - **WORDS_PER_SESSION**: 10 words per practice session
 - **CORRECT_FEEDBACK_DELAY_MS**: 1000ms before advancing after correct answer
-- **INCORRECT_FEEDBACK_DELAY_MS**: 3000ms before advancing after incorrect answer (allows time to review character comparison)
+- **INCORRECT_FEEDBACK_DELAY_MS**: 5000ms before advancing after incorrect answer (allows time to review character comparison)
 - **MAX_WORD_COUNT**: 1000 word database limit
 - **MAX_WORD_LENGTH**: 100 character limit per word
 

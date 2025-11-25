@@ -51,6 +51,13 @@ The app interface is available in English and German. Use the language switcher 
 3. Press Enter or click "Add Word"
 4. Repeat to build your word list
 
+### Deleting Words
+
+1. Click the "Manage Words" tab
+2. Click a word to select it (click again to deselect)
+3. Use Ctrl+click (Windows/Linux) or Cmd+click (Mac) to select multiple words
+4. Click "Delete Selected" to remove all selected words at once
+
 ### Practicing
 
 1. Click the "Practice" tab
